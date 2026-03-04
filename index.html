@@ -86,7 +86,7 @@
 <div class="header">
   <div class="header-left">
     <h1>🌙 <span id="hdrTitle">Noras Søvn</span></h1>
-    <div class="age-display">Nora · <strong id="ageDisplay">14 måneder</strong></div>
+    <div class="age-display">Nora · <strong id="ageDisplay">14 måneder</strong> · <span style="color:var(--border)">v<span id="versionDisplay"></span></span></div>
   </div>
   <div class="header-right">
     <button class="lang-btn active" id="btnDA" onclick="setLang('da')">DA</button>
@@ -187,7 +187,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Firebase config ────────────────────────────────────────────
+const APP_VERSION = '1.8';
 const FB_URL='https://nora-zzz-42-default-rtdb.europe-west1.firebasedatabase.app/nora2024xk9';
 
 async function fbGet(){
@@ -300,7 +300,11 @@ const T={
 };
 
 let lang='da';
-function t(key,...args){const v=T[lang][key];return typeof v==='function'?v(...args):(v??key);}
+function t(key,...args){
+  const v=T[lang] && T[lang][key];
+  if(v===undefined) return key;
+  return typeof v==='function'?v(...args):v;
+}
 function setLang(l){lang=l;document.getElementById('btnDA').classList.toggle('active',l==='da');document.getElementById('btnEN').classList.toggle('active',l==='en');applyTranslations();renderAll();}
 function applyTranslations(){
   const ids=['hdrTitle','sugTitle','todayNapTitle','lastNightTitle','logNightTitle','lNightDate','lBedtime','lWaketime',
@@ -348,6 +352,7 @@ function applySettings(){
   document.getElementById('winddownMins').value=s.winddownMins;
   document.getElementById('lastNapCutoff').value=s.lastNapCutoff||'17:00';
   document.getElementById('ageDisplay').textContent=s.ageMonths+' '+t('ageUnit');
+  document.getElementById('versionDisplay').textContent=APP_VERSION;
 }
 function saveSettings(){
   state.settings.ageMonths=parseInt(document.getElementById('ageMonths').value)||14;
