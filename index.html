@@ -73,7 +73,10 @@
   .toast.show{opacity:1;}
   .age-display{font-size:.82rem;color:var(--muted);margin-top:.15rem;}
   .age-display strong{color:var(--accent2);}
-  .info-note{font-size:.78rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
+  .checkin-btn{flex:1;padding:.6rem .5rem;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-size:.88rem;cursor:pointer;transition:all .2s;font-weight:600;}
+  .checkin-btn.active-tired{background:#2e1e0d;color:var(--warn);border-color:var(--warn);}
+  .checkin-btn.active-okay{background:#1e1a40;color:var(--accent2);border-color:var(--accent);}
+  .checkin-btn.active-fresh{background:#0d2e1e;color:var(--good);border-color:var(--good);}
   .sync-indicator{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem;transition:color .3s;}
   .sync-indicator.syncing{color:var(--warn);}
   .sync-indicator.synced{color:var(--good);}
@@ -104,6 +107,14 @@
     <h2 id="sugTitle">✨ Anbefalinger til i aften</h2>
     <div id="suggestionsContent"></div>
     <div id="reasonBox" class="reason-box" style="display:none"></div>
+  </div>
+  <div class="card" id="checkinCard" style="display:none">
+    <h2 id="checkinTitle">🌡️ Hvordan er Nora?</h2>
+    <div style="display:flex;gap:.5rem;margin-bottom:.25rem">
+      <button class="checkin-btn" id="cbTired" onclick="setCheckin('tired')">😴 Træt</button>
+      <button class="checkin-btn" id="cbOkay" onclick="setCheckin('okay')">😐 Okay</button>
+      <button class="checkin-btn" id="cbFresh" onclick="setCheckin('fresh')">😄 Frisk</button>
+    </div>
   </div>
   <div class="card"><h2 id="todayNapTitle">☀️ Lure i dag</h2><div id="todaySummary"></div></div>
   <div class="card"><h2 id="lastNightTitle">🌙 Sidste nat</h2><div id="lastNightSummary"></div></div>
@@ -235,7 +246,10 @@ const T={
     reasonShortNap:"Lurene i dag var kortere end anbefalet.",
     reasonBothBad:"Kort samlet søvn i går og kort lur i dag – tidligere sengetid anbefales.",
     reasonOneNap:"Kun én lur i dag – justeret lidt tidligere, men ikke for tidligt.",
-    reasonMissed:(mins)=>`Nora gik ${mins} min. for sent i seng i går – vi justerer gradvist.`,
+    reasonTired:"Nora virker træt – sengetid justeret 20 min. tidligere.",
+    reasonFresh:"Nora virker frisk – sengetid justeret 20 min. senere.",
+    checkinLabel:"Hvordan er Nora lige nu?",
+    checkinTired:"😴 Træt",checkinOkay:"😐 Okay",checkinFresh:"😄 Frisk",
     reasonCorrect:(bed)=>`Foreslået sengetid ${bed} hjælper med at komme tilbage til rytmen.`,
   },
   en:{
@@ -271,7 +285,10 @@ const T={
     reasonShortNap:"Today's naps were shorter than recommended.",
     reasonBothBad:"Low total sleep yesterday and short nap today – an earlier bedtime is recommended.",
     reasonOneNap:"Only one nap today – adjusted slightly earlier, but not too early.",
-    reasonMissed:(mins)=>`Nora went to bed ${mins} min. late last night – gently adjusting back.`,
+    reasonTired:"Nora seems tired – bedtime adjusted 20 min. earlier.",
+    reasonFresh:"Nora seems fresh – bedtime adjusted 20 min. later.",
+    checkinLabel:"How is Nora right now?",
+    checkinTired:"😴 Tired",checkinOkay:"😐 Okay",checkinFresh:"😄 Fresh",
     reasonCorrect:(bed)=>`Suggested bedtime ${bed} helps return to the recommended rhythm.`,
   }
 };
@@ -401,6 +418,28 @@ function computeSuggestions(){
   if(onlyOneNap&&earlyAdjust<30){oneNapAdjust=Math.min(30,30-earlyAdjust);earlyAdjust=30;}
   idealBedMins-=earlyAdjust;
 
+  // Wake window: don't suggest bedtime too soon after last nap
+  const minWakeWindowMins = 240; // 4 hours minimum awake time after last nap
+  const todayNapEntries2 = state.entries.filter(e=>e.date===today&&e.type==='nap');
+  let lastNapEndMins = null;
+  todayNapEntries2.forEach(e=>{
+    (e.naps||[]).forEach(n=>{
+      let en=timeToMins(n.end);
+      if(lastNapEndMins===null||en>lastNapEndMins) lastNapEndMins=en;
+    });
+  });
+  if(lastNapEndMins!==null){
+    const earliestBed = lastNapEndMins + minWakeWindowMins;
+    if(idealBedMins < earliestBed) idealBedMins = earliestBed;
+  }
+
+  // Evening check-in adjustment
+  const checkin = state.eveningCheckin && state.eveningCheckin.date === today ? state.eveningCheckin.mood : null;
+  let checkinAdjust = 0;
+  if(checkin === 'tired') checkinAdjust = -20;
+  else if(checkin === 'fresh') checkinAdjust = 20;
+  idealBedMins += checkinAdjust;
+
   const winddownMins=idealBedMins-s.winddownMins;
 
   const reasons=[];
@@ -412,8 +451,11 @@ function computeSuggestions(){
   if(oneNapAdjust>0)reasons.push(t('reasonOneNap'));
   if(correctionMins>0){reasons.push(t('reasonMissed',Math.round(correctionMins/0.4)));reasons.push(t('reasonCorrect',minsToTime(idealBedMins)));}
 
+  if(checkin==='tired')reasons.push(t('reasonTired'));
+  else if(checkin==='fresh')reasons.push(t('reasonFresh'));
+
   return{bedtime:minsToTime(idealBedMins),winddown:minsToTime(winddownMins),
-    todayNapMins,lastNightMins,lastNightWakings,
+    todayNapMins,lastNightMins,lastNightWakings,checkin,
     hadBadNight,hadShortNap,onlyOneNap,correctionMins,earlyAdjust,
     todayRelaxed,reasons,rec};
 }
@@ -432,6 +474,14 @@ function renderToday(){
   const rb=document.getElementById('reasonBox');
   if(sug.reasons.length){rb.style.display='block';rb.innerHTML=sug.reasons.map(r=>`<div class="reason-item">💬 ${r}</div>`).join('');}
   else rb.style.display='none';
+
+  // Only show check-in within 2 hours before wind-down
+  const nowMins=new Date().getHours()*60+new Date().getMinutes();
+  const winddownMinsVal=timeToMins(sug.winddown);
+  const checkinVisible=nowMins>=winddownMinsVal-120;
+  const checkinCard=document.getElementById('checkinCard');
+  if(checkinCard)checkinCard.style.display=checkinVisible?'block':'none';
+  renderCheckin(sug.checkin);
 
   const nm=sug.todayNapMins,nt=sug.rec.napMin*60;
   const np=Math.min(100,Math.round(nm/nt*100));
@@ -561,7 +611,28 @@ function saveNaps(){
   showToast(t('napsSaved'));renderAll();
 }
 
-function clearData(){if(confirm(t('confirmClear'))){state.entries=[];saveState();showToast(t('cleared'));renderAll();}}
+function setCheckin(mood){
+  const current=state.eveningCheckin&&state.eveningCheckin.date===todayStr()?state.eveningCheckin.mood:null;
+  // Toggle off if tapping the same option again
+  state.eveningCheckin={date:todayStr(),mood:current===mood?null:mood};
+  saveState();
+  renderToday();
+}
+function renderCheckin(checkin){
+  const card=document.getElementById('checkinCard');
+  if(!card)return;
+  ['tired','okay','fresh'].forEach(m=>{
+    const el=document.getElementById('cb'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(el)el.className='checkin-btn'+(checkin===m?' active-'+m:'');
+  });
+  const title=document.getElementById('checkinTitle');
+  if(title)title.textContent=t('checkinLabel');
+  const btns={tired:document.getElementById('cbTired'),okay:document.getElementById('cbOkay'),fresh:document.getElementById('cbFresh')};
+  if(btns.tired)btns.tired.textContent=t('checkinTired');
+  if(btns.okay)btns.okay.textContent=t('checkinOkay');
+  if(btns.fresh)btns.fresh.textContent=t('checkinFresh');
+}
+function clearData(){if(confirm(t('confirmClear'))){state.entries=[];state.eveningCheckin=null;saveState();showToast(t('cleared'));renderAll();}}
 function renderAll(){renderToday();renderHistory();}
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
 function initDates(){
