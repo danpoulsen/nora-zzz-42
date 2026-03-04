@@ -5,12 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Noras Søvn 🌙</title>
 <style>
-  :root {
-    --bg:#0f0c1a;--card:#1a1630;--card2:#221e38;
-    --accent:#7c6af7;--accent2:#b59eff;--warn:#f7a76c;
-    --good:#6cf7a8;--bad:#f76c6c;--text:#e8e4ff;
-    --muted:#8880aa;--border:#2e2a4a;
-  }
+  :root{--bg:#0f0c1a;--card:#1a1630;--card2:#221e38;--accent:#7c6af7;--accent2:#b59eff;--warn:#f7a76c;--good:#6cf7a8;--bad:#f76c6c;--text:#e8e4ff;--muted:#8880aa;--border:#2e2a4a;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
   h2{font-size:1rem;font-weight:600;color:var(--accent2);margin-bottom:.75rem;}
@@ -23,16 +18,11 @@
   .tab{flex:1;padding:.75rem;text-align:center;font-size:.85rem;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
   .tab.active{color:var(--accent2);border-bottom-color:var(--accent);}
   .page{display:none;padding:1rem;max-width:480px;margin:0 auto;overflow-x:hidden;}
-  .card{overflow:hidden;}
   .page.active{display:block;}
-  .card{background:var(--card);border-radius:14px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border);}
+  .card{background:var(--card);border-radius:14px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border);overflow:hidden;}
   label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:.35rem;margin-top:.7rem;}
   label:first-child{margin-top:0;}
-  input[type=time],input[type=number],input[type=date],select{
-    width:100%;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;
-    color:var(--text);padding:.6rem .75rem;font-size:1rem;outline:none;
-    -webkit-appearance:none;appearance:none;
-  }
+  input[type=time],input[type=number],input[type=date],select{width:100%;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.6rem .75rem;font-size:1rem;outline:none;-webkit-appearance:none;appearance:none;}
   input:focus{border-color:var(--accent);}
   .btn{display:block;width:100%;padding:.85rem;border-radius:10px;border:none;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:1rem;}
   .btn:active{opacity:.8;}
@@ -69,23 +59,27 @@
   .nap-pill{display:inline-block;background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:.15rem .55rem;margin:.15rem .15rem 0 0;font-size:.75rem;color:var(--accent2);}
   .nap-pill .del-nap{color:var(--bad);cursor:pointer;margin-left:.3rem;font-size:.8rem;}
   .waking-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
-  .waking-row input{flex:1;}
+  .waking-row input{flex:1;min-width:0;}
   .remove-btn{background:#3a1a1a;color:var(--bad);border:1px solid #5a2a2a;border-radius:8px;padding:.45rem .7rem;font-size:.9rem;cursor:pointer;flex-shrink:0;}
   .add-btn{background:var(--card2);color:var(--accent2);border:1px solid var(--border);border-radius:8px;padding:.5rem 1rem;font-size:.83rem;cursor:pointer;margin-top:.25rem;}
   .nap-entry{display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;}
-  .nap-entry input{flex:1;}
+  .nap-entry input{flex:1;min-width:0;}
   .divider{height:1px;background:var(--border);margin:.75rem 0;}
   .section-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;}
+  .short-waking-row{display:flex;align-items:center;gap:.75rem;margin-top:.5rem;}
+  .short-waking-row label{margin:0;white-space:nowrap;font-size:.82rem;color:var(--muted);}
   .empty{text-align:center;color:var(--muted);padding:2rem 1rem;font-size:.9rem;}
   .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:.65rem 1.4rem;border-radius:99px;font-size:.9rem;font-weight:600;opacity:0;transition:opacity .3s;z-index:100;pointer-events:none;white-space:nowrap;}
   .toast.show{opacity:1;}
   .age-display{font-size:.82rem;color:var(--muted);margin-top:.15rem;}
   .age-display strong{color:var(--accent2);}
   .info-note{font-size:.78rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
+  .sync-indicator{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem;transition:color .3s;}
+  .sync-indicator.syncing{color:var(--warn);}
+  .sync-indicator.synced{color:var(--good);}
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="header-left">
     <h1>🌙 <span id="hdrTitle">Noras Søvn</span></h1>
@@ -97,28 +91,22 @@
     <button class="btn btn-secondary btn-small" onclick="showPage('settings')">⚙️</button>
   </div>
 </div>
-
 <div class="tabs">
   <div class="tab active" id="tab-today" onclick="showPage('today')">I dag</div>
   <div class="tab" id="tab-log" onclick="showPage('log')">Log søvn</div>
   <div class="tab" id="tab-history" onclick="showPage('history')">Historik</div>
 </div>
+<div class="sync-indicator" id="syncIndicator">⟳ Forbinder...</div>
 
 <!-- TODAY -->
 <div id="page-today" class="page active">
-  <div id="suggestionsBox" class="suggestion-box">
+  <div class="suggestion-box">
     <h2 id="sugTitle">✨ Anbefalinger til i aften</h2>
     <div id="suggestionsContent"></div>
     <div id="reasonBox" class="reason-box" style="display:none"></div>
   </div>
-  <div class="card">
-    <h2 id="todayNapTitle">☀️ Lure i dag</h2>
-    <div id="todaySummary"></div>
-  </div>
-  <div class="card">
-    <h2 id="lastNightTitle">🌙 Sidste nat</h2>
-    <div id="lastNightSummary"></div>
-  </div>
+  <div class="card"><h2 id="todayNapTitle">☀️ Lure i dag</h2><div id="todaySummary"></div></div>
+  <div class="card"><h2 id="lastNightTitle">🌙 Sidste nat</h2><div id="lastNightSummary"></div></div>
 </div>
 
 <!-- LOG -->
@@ -134,7 +122,11 @@
     <div class="divider"></div>
     <div class="section-title" id="wakingsTitle">Natlige opvågninger</div>
     <div id="wakingsList"></div>
-    <button class="add-btn" id="btnAddWaking" onclick="addWaking()">+ Tilføj opvågning</button>
+    <button class="add-btn" id="btnAddWaking" onclick="addWaking()">+ Tilføj lang opvågning</button>
+    <div class="short-waking-row">
+      <label id="lShortWakings">Korte opvågninger (&lt;10 min):</label>
+      <input type="number" id="shortWakings" min="0" max="20" value="0" style="max-width:70px">
+    </div>
     <button class="btn btn-primary" id="btnSaveNight" onclick="saveNight()">Gem nattesøvn</button>
   </div>
   <div class="card">
@@ -182,128 +174,150 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Translations ───────────────────────────────────────────────────────────
-const T = {
-  da: {
-    hdrTitle:"Noras Søvn", ageUnit:"måneder",
+// ── Firebase config ────────────────────────────────────────────
+const FB_URL='https://nora-zzz-42-default-rtdb.europe-west1.firebasedatabase.app/nora2024xk9';
+
+async function fbGet(){
+  try{
+    const r=await fetch(FB_URL+'.json');
+    if(!r.ok)return null;
+    return await r.json();
+  }catch(e){return null;}
+}
+async function fbSet(data){
+  try{
+    const r=await fetch(FB_URL+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    return r.ok;
+  }catch(e){return false;}
+}
+
+function setSyncStatus(status){
+  const el=document.getElementById('syncIndicator');
+  if(status==='syncing'){el.textContent='⟳ Gemmer...';el.className='sync-indicator syncing';}
+  else if(status==='synced'){el.textContent='✓ Synkroniseret';el.className='sync-indicator synced';setTimeout(()=>{el.textContent='';el.className='sync-indicator';},2000);}
+  else if(status==='connecting'){el.textContent='⟳ Forbinder...';el.className='sync-indicator';}
+  else if(status==='error'){el.textContent='⚠ Kunne ikke synkronisere';el.className='sync-indicator';el.style.color='var(--bad)';}
+  else{el.textContent='';el.className='sync-indicator';}
+}
+
+// ── Translations ───────────────────────────────────────────────
+const T={
+  da:{
+    hdrTitle:"Noras Søvn",ageUnit:"måneder",
     sugTitle:"✨ Anbefalinger til i aften",
-    winddownLabel:"🌅 Ro på", bedtimeLabel:"🌙 Sengetid", wakeGoalLabel:"⏰ Opvågning",
-    todayNapTitle:"☀️ Lure i dag", lastNightTitle:"🌙 Sidste nat",
-    logNightTitle:"🌙 Log nattesøvn", lNightDate:"Dato (natten startede)",
-    lBedtime:"Sengetid (hvornår faldt hun i søvn)", lWaketime:"Vågnetid",
-    wakingsTitle:"NATLIGE OPVÅGNINGER", btnAddWaking:"+ Tilføj opvågning", btnSaveNight:"Gem nattesøvn",
-    logNapTitle:"☀️ Log lur", lNapDate:"Dato",
-    btnAddNap:"+ Tilføj endnu en lur", btnSaveNaps:"Gem lure",
+    winddownLabel:"🌅 Ro på",bedtimeLabel:"🌙 Sengetid",wakeGoalLabel:"⏰ Opvågning",
+    todayNapTitle:"☀️ Lure i dag",lastNightTitle:"🌙 Sidste nat",
+    logNightTitle:"🌙 Log nattesøvn",lNightDate:"Dato (natten startede)",
+    lBedtime:"Sengetid (hvornår faldt hun i søvn)",lWaketime:"Vågnetid",
+    wakingsTitle:"NATLIGE OPVÅGNINGER",btnAddWaking:"+ Tilføj lang opvågning",btnSaveNight:"Gem nattesøvn",
+    lShortWakings:"Korte opvågninger (<10 min):",
+    logNapTitle:"☀️ Log lur",lNapDate:"Dato",
+    btnAddNap:"+ Tilføj endnu en lur",btnSaveNaps:"Gem lure",
     napInfoNote:"Lure tilføjes til eksisterende lure for den valgte dato.",
     historyTitle:"📋 Søvnhistorik",
-    settingsTitle:"⚙️ Indstillinger", lAgeMo:"Noras alder (måneder)",
-    lWakeGoal:"Mål for opvågning (hverdage)", lWinddown:"Ro-ned-tid (minutter)",
-    btnSaveSettings:"Gem indstillinger", dataTitle:"🗑️ Data", btnClearData:"Slet al søvndata",
-    tabToday:"I dag", tabLog:"Log søvn", tabHistory:"Historik",
+    settingsTitle:"⚙️ Indstillinger",lAgeMo:"Noras alder (måneder)",
+    lWakeGoal:"Mål for opvågning (hverdage)",lWinddown:"Ro-ned-tid (minutter)",
+    btnSaveSettings:"Gem indstillinger",dataTitle:"🗑️ Data",btnClearData:"Slet al søvndata",
+    tabToday:"I dag",tabLog:"Log søvn",tabHistory:"Historik",
     weekendBadge:"🛌 Weekend – ingen fast opvågning",
-    tagGood:"God", tagFair:"Okay", tagPoor:"For lidt",
-    tagOnTrack:"På sporet", tagShort:"Lidt kort", tagVeryShort:"For kort",
-    noNaps:"Ingen lure logget endnu i dag", noNight:"Ingen nattesøvn logget endnu",
+    tagGood:"God",tagFair:"Okay",tagPoor:"For lidt",tagOnTrack:"På sporet",tagShort:"Lidt kort",tagVeryShort:"For kort",
+    noNaps:"Ingen lure logget endnu i dag",noNight:"Ingen nattesøvn logget endnu",
     noHistory:"Ingen søvndata endnu.\nTryk på 'Log søvn' for at komme i gang.",
-    saved:"Gemt! ✓", napsSaved:"Lure gemt! ✓", settingsSaved:"Indstillinger gemt! ✓", cleared:"Data slettet",
-    fillFields:"Udfyld venligst alle felter", selectDate:"Vælg en dato", addNap:"Tilføj mindst én lur",
+    saved:"Gemt! ✓",napsSaved:"Lure gemt! ✓",settingsSaved:"Indstillinger gemt! ✓",cleared:"Data slettet",
+    fillFields:"Udfyld venligst alle felter",selectDate:"Vælg en dato",addNap:"Tilføj mindst én lur",
     confirmClear:"Slet al søvndata? Dette kan ikke fortrydes.",
-    napTotal:"Samlet lurtid", nightSleep:"Nattesøvn (effektiv)", awakeOvernight:"Vågen om natten",
-    goal:"Mål", night:"Nat", naps:"Lure", total:"Total", awake:"Vågen",
-    deleteNap:"Slet lur",
+    napTotal:"Samlet lurtid",nightSleep:"Nattesøvn (effektiv)",awakeOvernight:"Vågen om natten",
+    shortWakingsNote:(n)=>`Kortvarige opvågninger: ${n}`,
+    goal:"Mål",night:"Nat",naps:"Lure",total:"Total",awake:"Vågen",deleteNap:"Slet lur",
     reasonBase:(bed,wake)=>`Sengetid ${bed} giver Nora tid til at sove til opvågningsmålet ${wake}.`,
     reasonWeekend:"Weekend: ingen fast opvågning – Nora må sove til hun vågner naturligt.",
-    reasonBadNight:"Nora sov dårligt i nat med lange opvågninger.",
+    reasonBadNight:"Noras samlede søvn i går (nat + lure) var kortere end anbefalet.",
     reasonShortNap:"Lurene i dag var kortere end anbefalet.",
-    reasonBothBad:"Dårlig nat og kort lur – tidligere sengetid anbefales.",
+    reasonBothBad:"Kort samlet søvn i går og kort lur i dag – tidligere sengetid anbefales.",
+    reasonOneNap:"Kun én lur i dag – justeret lidt tidligere, men ikke for tidligt.",
     reasonMissed:(mins)=>`Nora gik ${mins} min. for sent i seng i går – vi justerer gradvist.`,
     reasonCorrect:(bed)=>`Foreslået sengetid ${bed} hjælper med at komme tilbage til rytmen.`,
   },
-  en: {
-    hdrTitle:"Nora's Sleep", ageUnit:"months",
+  en:{
+    hdrTitle:"Nora's Sleep",ageUnit:"months",
     sugTitle:"✨ Tonight's Suggestions",
-    winddownLabel:"🌅 Ro på (wind-down)", bedtimeLabel:"🌙 Bedtime", wakeGoalLabel:"⏰ Wake-up goal",
-    todayNapTitle:"☀️ Naps Today", lastNightTitle:"🌙 Last Night",
-    logNightTitle:"🌙 Log Night Sleep", lNightDate:"Date (night started)",
-    lBedtime:"Bedtime (when she fell asleep)", lWaketime:"Wake-up time",
-    wakingsTitle:"NIGHT WAKINGS", btnAddWaking:"+ Add Night Waking", btnSaveNight:"Save Night Sleep",
-    logNapTitle:"☀️ Log Nap", lNapDate:"Date",
-    btnAddNap:"+ Add Another Nap", btnSaveNaps:"Save Naps",
+    winddownLabel:"🌅 Ro på (wind-down)",bedtimeLabel:"🌙 Bedtime",wakeGoalLabel:"⏰ Wake-up goal",
+    todayNapTitle:"☀️ Naps Today",lastNightTitle:"🌙 Last Night",
+    logNightTitle:"🌙 Log Night Sleep",lNightDate:"Date (night started)",
+    lBedtime:"Bedtime (when she fell asleep)",lWaketime:"Wake-up time",
+    wakingsTitle:"NIGHT WAKINGS",btnAddWaking:"+ Add Long Waking",btnSaveNight:"Save Night Sleep",
+    lShortWakings:"Brief wakings (<10 min):",
+    logNapTitle:"☀️ Log Nap",lNapDate:"Date",
+    btnAddNap:"+ Add Another Nap",btnSaveNaps:"Save Naps",
     napInfoNote:"Naps are added to any existing naps for the selected date.",
     historyTitle:"📋 Sleep History",
-    settingsTitle:"⚙️ Settings", lAgeMo:"Nora's age (months)",
-    lWakeGoal:"Weekday wake-up goal", lWinddown:"Wind-down duration (minutes)",
-    btnSaveSettings:"Save Settings", dataTitle:"🗑️ Data", btnClearData:"Clear All Sleep Data",
-    tabToday:"Today", tabLog:"Log Sleep", tabHistory:"History",
+    settingsTitle:"⚙️ Settings",lAgeMo:"Nora's age (months)",
+    lWakeGoal:"Weekday wake-up goal",lWinddown:"Wind-down duration (minutes)",
+    btnSaveSettings:"Save Settings",dataTitle:"🗑️ Data",btnClearData:"Clear All Sleep Data",
+    tabToday:"Today",tabLog:"Log Sleep",tabHistory:"History",
     weekendBadge:"🛌 Weekend – no set wake time",
-    tagGood:"Good", tagFair:"Fair", tagPoor:"Too little",
-    tagOnTrack:"On track", tagShort:"A bit short", tagVeryShort:"Very short",
-    noNaps:"No naps logged today yet", noNight:"No night sleep logged yet",
+    tagGood:"Good",tagFair:"Fair",tagPoor:"Too little",tagOnTrack:"On track",tagShort:"A bit short",tagVeryShort:"Very short",
+    noNaps:"No naps logged today yet",noNight:"No night sleep logged yet",
     noHistory:"No sleep data yet.\nTap 'Log Sleep' to get started.",
-    saved:"Saved! ✓", napsSaved:"Naps saved! ✓", settingsSaved:"Settings saved! ✓", cleared:"Data cleared",
-    fillFields:"Please fill in all fields", selectDate:"Please select a date", addNap:"Please add at least one nap",
+    saved:"Saved! ✓",napsSaved:"Naps saved! ✓",settingsSaved:"Settings saved! ✓",cleared:"Data cleared",
+    fillFields:"Please fill in all fields",selectDate:"Please select a date",addNap:"Please add at least one nap",
     confirmClear:"Clear all sleep data? This cannot be undone.",
-    napTotal:"Total nap time", nightSleep:"Night sleep (effective)", awakeOvernight:"Awake overnight",
-    goal:"Goal", night:"Night", naps:"Naps", total:"Total", awake:"Awake",
-    deleteNap:"Delete nap",
+    napTotal:"Total nap time",nightSleep:"Night sleep (effective)",awakeOvernight:"Awake overnight",
+    shortWakingsNote:(n)=>`Brief wakings: ${n}`,
+    goal:"Goal",night:"Night",naps:"Naps",total:"Total",awake:"Awake",deleteNap:"Delete nap",
     reasonBase:(bed,wake)=>`Bedtime at ${bed} gives Nora enough time to sleep through to the ${wake} wake-up goal.`,
     reasonWeekend:"Weekend: no fixed wake time – Nora can sleep until she wakes naturally.",
-    reasonBadNight:"Nora had a poor night with extended wakings.",
+    reasonBadNight:"Nora's total sleep yesterday (night + naps) was below the recommended amount.",
     reasonShortNap:"Today's naps were shorter than recommended.",
-    reasonBothBad:"Poor night and short nap – an earlier bedtime is recommended.",
+    reasonBothBad:"Low total sleep yesterday and short nap today – an earlier bedtime is recommended.",
+    reasonOneNap:"Only one nap today – adjusted slightly earlier, but not too early.",
     reasonMissed:(mins)=>`Nora went to bed ${mins} min. late last night – gently adjusting back.`,
     reasonCorrect:(bed)=>`Suggested bedtime ${bed} helps return to the recommended rhythm.`,
   }
 };
 
-let lang = 'da';
-function t(key,...args){
-  const v=T[lang][key];
-  return typeof v==='function'?v(...args):(v??key);
-}
-function setLang(l){
-  lang=l;
-  document.getElementById('btnDA').classList.toggle('active',l==='da');
-  document.getElementById('btnEN').classList.toggle('active',l==='en');
-  applyTranslations();renderAll();
-}
+let lang='da';
+function t(key,...args){const v=T[lang][key];return typeof v==='function'?v(...args):(v??key);}
+function setLang(l){lang=l;document.getElementById('btnDA').classList.toggle('active',l==='da');document.getElementById('btnEN').classList.toggle('active',l==='en');applyTranslations();renderAll();}
 function applyTranslations(){
-  const ids=['hdrTitle','sugTitle','todayNapTitle','lastNightTitle','logNightTitle',
-    'lNightDate','lBedtime','lWaketime','wakingsTitle','btnAddWaking','btnSaveNight',
-    'logNapTitle','lNapDate','btnAddNap','btnSaveNaps','napInfoNote','historyTitle',
-    'settingsTitle','lAgeMo','lWakeGoal','lWinddown','btnSaveSettings','dataTitle','btnClearData'];
-  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t(id);});
+  ['hdrTitle','sugTitle','todayNapTitle','lastNightTitle','logNightTitle','lNightDate','lBedtime','lWaketime',
+   'wakingsTitle','btnAddWaking','btnSaveNight','lShortWakings','logNapTitle','lNapDate','btnAddNap','btnSaveNaps',
+   'napInfoNote','historyTitle','settingsTitle','lAgeMo','lWakeGoal','lWinddown','btnSaveSettings','dataTitle','btnClearData']
+  .forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t(id);});
   document.getElementById('tab-today').textContent=t('tabToday');
   document.getElementById('tab-log').textContent=t('tabLog');
   document.getElementById('tab-history').textContent=t('tabHistory');
   document.getElementById('ageDisplay').textContent=(state.settings.ageMonths||14)+' '+t('ageUnit');
 }
 
-// ── State & Storage ────────────────────────────────────────────────────────
-const STORAGE_KEY='sleeptracker_v3';
+// ── State ──────────────────────────────────────────────────────
 let state={settings:{ageMonths:14,wakeGoal:'07:00',winddownMins:30},entries:[]};
 
 async function loadState(){
-  try{const r=await window.storage.get(STORAGE_KEY);if(r?.value)state=JSON.parse(r.value);}catch(e){}
+  setSyncStatus('connecting');
+  const data=await fbGet();
+  if(data){state=data;if(!state.entries)state.entries=[];if(!state.settings)state.settings={ageMonths:14,wakeGoal:'07:00',winddownMins:30};}
+  setSyncStatus('');
   applySettings();applyTranslations();renderAll();
 }
+
 async function saveState(){
-  try{await window.storage.set(STORAGE_KEY,JSON.stringify(state));}catch(e){}
+  setSyncStatus('syncing');
+  const ok=await fbSet(state);
+  setSyncStatus(ok?'synced':'error');
 }
 
-// ── Navigation ─────────────────────────────────────────────────────────────
+// ── Navigation ─────────────────────────────────────────────────
 function showPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
-  ['today','log','history'].forEach((name,i)=>{
-    if(name===p)document.querySelectorAll('.tab')[i].classList.add('active');
-  });
+  ['today','log','history'].forEach((n,i)=>{if(n===p)document.querySelectorAll('.tab')[i].classList.add('active');});
   if(p==='today')renderToday();
   if(p==='history')renderHistory();
 }
 
-// ── Settings ───────────────────────────────────────────────────────────────
+// ── Settings ───────────────────────────────────────────────────
 function applySettings(){
   const s=state.settings;
   document.getElementById('ageMonths').value=s.ageMonths;
@@ -318,12 +332,8 @@ function saveSettings(){
   saveState();applySettings();showToast(t('settingsSaved'));showPage('today');
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-function recSleep(mo){
-  return mo<=12
-    ?{min:12,max:16,nightMin:10,napMin:2}
-    :{min:11,max:14,nightMin:10,napMin:1.5};
-}
+// ── Helpers ────────────────────────────────────────────────────
+function recSleep(mo){return mo<=12?{min:12,max:16,nightMin:10,napMin:2}:{min:11,max:14,nightMin:10,napMin:1.5};}
 function timeToMins(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function minsToTime(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
 function fmtDur(mins){const h=Math.floor(mins/60),m=mins%60;return m>0?`${h}t ${m}m`:`${h}t`;}
@@ -331,14 +341,7 @@ function todayStr(){return new Date().toISOString().slice(0,10);}
 function isWeekend(d){const w=new Date(d+'T12:00:00').getDay();return w===0||w===6;}
 function isFriday(d){return new Date(d+'T12:00:00').getDay()===5;}
 function isRelaxed(d){return isWeekend(d)||isFriday(d);}
-function fmtDate(d){
-  // DD/MM/YYYY
-  const[y,m,day]=d.split('-');return`${day}/${m}/${y}`;
-}
-function fmtDateLabel(d){
-  const dt=new Date(d+'T12:00:00');
-  return dt.toLocaleDateString(lang==='da'?'da-DK':'en-GB',{weekday:'short',day:'2-digit',month:'short'});
-}
+function fmtDateLabel(d){return new Date(d+'T12:00:00').toLocaleDateString(lang==='da'?'da-DK':'en-GB',{weekday:'short',day:'2-digit',month:'short'});}
 
 function nightDuration(e){
   if(!e||e.type!=='night')return 0;
@@ -350,46 +353,52 @@ function nightDuration(e){
 }
 function napDuration(e){
   if(!e||e.type!=='nap')return 0;
-  return(e.naps||[]).reduce((s,n)=>{
-    let st=timeToMins(n.start),en=timeToMins(n.end);
-    if(en<=st)en+=1440;return s+Math.max(0,en-st);
-  },0);
+  return(e.naps||[]).reduce((s,n)=>{let st=timeToMins(n.start),en=timeToMins(n.end);if(en<=st)en+=1440;return s+Math.max(0,en-st);},0);
+}
+function prevDayTotalSleep(nightEntry){
+  if(!nightEntry)return null;
+  const nightMins=nightDuration(nightEntry);
+  const prevNapMins=state.entries.filter(e=>e.date===nightEntry.date&&e.type==='nap').reduce((s,e)=>s+napDuration(e),0);
+  return nightMins+prevNapMins;
 }
 
-// ── Suggestion Engine ──────────────────────────────────────────────────────
+// ── Suggestion Engine ──────────────────────────────────────────
 function computeSuggestions(){
   const s=state.settings;
   const rec=recSleep(s.ageMonths);
   const today=todayStr();
   const todayRelaxed=isRelaxed(today);
 
-  const todayNapMins=state.entries.filter(e=>e.date===today&&e.type==='nap')
-    .reduce((sum,e)=>sum+napDuration(e),0);
+  const todayNapEntries=state.entries.filter(e=>e.date===today&&e.type==='nap');
+  const todayNapMins=todayNapEntries.reduce((sum,e)=>sum+napDuration(e),0);
+  const todayNapCount=todayNapEntries.reduce((s,e)=>s+(e.naps||[]).length,0);
 
-  const lastNight=state.entries.filter(e=>e.type==='night')
-    .sort((a,b)=>b.date.localeCompare(a.date))[0]||null;
+  const lastNight=state.entries.filter(e=>e.type==='night').sort((a,b)=>b.date.localeCompare(a.date))[0]||null;
   const lastNightMins=lastNight?nightDuration(lastNight):null;
   const lastNightWakings=lastNight?(lastNight.wakings||[]).reduce((s,w)=>s+(w.duration||0),0):0;
-  const hadBadNight=lastNightMins!==null&&(lastNightMins<rec.nightMin*60*0.85||lastNightWakings>=60);
+
+  const prevTotal=prevDayTotalSleep(lastNight);
+  const hadBadNight=prevTotal!==null&&prevTotal<rec.min*60*0.85;
   const hadShortNap=todayNapMins>0&&todayNapMins<rec.napMin*60*0.75;
+  const onlyOneNap=todayNapCount===1;
 
   const wakeGoalMins=timeToMins(s.wakeGoal);
   let idealBedMins=wakeGoalMins-(rec.nightMin*60);
 
-  // Gentle correction for missed bedtime
   let correctionMins=0;
   if(lastNight){
-    const sugBed=wakeGoalMins-rec.nightMin*60;
-    const lateness=timeToMins(lastNight.bedtime)-sugBed;
+    const lateness=timeToMins(lastNight.bedtime)-(wakeGoalMins-rec.nightMin*60);
     if(lateness>15)correctionMins=Math.min(20,Math.round(lateness*0.4));
   }
   idealBedMins-=correctionMins;
 
-  // Overtiredness
   let earlyAdjust=0;
   if(hadBadNight&&hadShortNap)earlyAdjust=30;
   else if(hadBadNight)earlyAdjust=15;
   else if(hadShortNap)earlyAdjust=20;
+
+  let oneNapAdjust=0;
+  if(onlyOneNap&&earlyAdjust<30){oneNapAdjust=Math.min(30,30-earlyAdjust);earlyAdjust=30;}
   idealBedMins-=earlyAdjust;
 
   const winddownMins=idealBedMins-s.winddownMins;
@@ -400,22 +409,18 @@ function computeSuggestions(){
   if(hadBadNight&&hadShortNap)reasons.push(t('reasonBothBad'));
   else if(hadBadNight)reasons.push(t('reasonBadNight'));
   else if(hadShortNap)reasons.push(t('reasonShortNap'));
-  if(correctionMins>0){
-    reasons.push(t('reasonMissed',Math.round(correctionMins/0.4)));
-    reasons.push(t('reasonCorrect',minsToTime(idealBedMins)));
-  }
+  if(oneNapAdjust>0)reasons.push(t('reasonOneNap'));
+  if(correctionMins>0){reasons.push(t('reasonMissed',Math.round(correctionMins/0.4)));reasons.push(t('reasonCorrect',minsToTime(idealBedMins)));}
 
   return{bedtime:minsToTime(idealBedMins),winddown:minsToTime(winddownMins),
     todayNapMins,lastNightMins,lastNightWakings,
-    hadBadNight,hadShortNap,correctionMins,earlyAdjust,
+    hadBadNight,hadShortNap,onlyOneNap,correctionMins,earlyAdjust,
     todayRelaxed,reasons,rec};
 }
 
-// ── Render Today ───────────────────────────────────────────────────────────
+// ── Render Today ───────────────────────────────────────────────
 function renderToday(){
   const sug=computeSuggestions();
-  const today=todayStr();
-
   let sugHTML='';
   if(sug.todayRelaxed)sugHTML+=`<div class="weekend-badge">${t('weekendBadge')}</div><br>`;
   sugHTML+=`
@@ -425,12 +430,9 @@ function renderToday(){
   document.getElementById('suggestionsContent').innerHTML=sugHTML;
 
   const rb=document.getElementById('reasonBox');
-  if(sug.reasons.length){
-    rb.style.display='block';
-    rb.innerHTML=sug.reasons.map(r=>`<div class="reason-item">💬 ${r}</div>`).join('');
-  } else rb.style.display='none';
+  if(sug.reasons.length){rb.style.display='block';rb.innerHTML=sug.reasons.map(r=>`<div class="reason-item">💬 ${r}</div>`).join('');}
+  else rb.style.display='none';
 
-  // Today naps
   const nm=sug.todayNapMins,nt=sug.rec.napMin*60;
   const np=Math.min(100,Math.round(nm/nt*100));
   const nc=np>=80?'':np>=50?'warn':'bad';
@@ -438,33 +440,34 @@ function renderToday(){
   document.getElementById('todaySummary').innerHTML=nm>0?`
     <div style="font-size:.85rem;color:var(--muted);margin-bottom:.3rem">${t('napTotal')}</div>
     <div style="font-size:1.4rem;font-weight:700;color:var(--accent2)">${fmtDur(nm)} ${ntag}</div>
-    <div class="sleep-bar-wrap">
-      <div class="sleep-bar-bg"><div class="sleep-bar ${nc}" style="width:${np}%"></div></div>
-      <div class="bar-labels"><span>0</span><span>${t('goal')}: ${fmtDur(nt)}</span></div>
-    </div>`:`<div class="empty">${t('noNaps')}</div>`;
+    <div class="sleep-bar-wrap"><div class="sleep-bar-bg"><div class="sleep-bar ${nc}" style="width:${np}%"></div></div>
+    <div class="bar-labels"><span>0</span><span>${t('goal')}: ${fmtDur(nt)}</span></div></div>`
+    :`<div class="empty">${t('noNaps')}</div>`;
 
-  // Last night
   const ln=sug.lastNightMins;
   if(ln!==null){
     const nt2=sug.rec.nightMin*60,p=Math.min(100,Math.round(ln/nt2*100));
     const col=p>=90?'':p>=70?'warn':'bad';
     const tag=p>=90?`<span class="tag tag-good">${t('tagGood')}</span>`:p>=70?`<span class="tag tag-warn">${t('tagFair')}</span>`:`<span class="tag tag-bad">${t('tagPoor')}</span>`;
-    const wn=sug.lastNightWakings>0?`<div style="font-size:.82rem;color:var(--warn);margin-top:.4rem">😴 ${t('awakeOvernight')}: ${fmtDur(sug.lastNightWakings)}</div>`:'';
+    const lastNight=state.entries.filter(e=>e.type==='night').sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const longWakings=lastNight?(lastNight.wakings||[]).reduce((s,w)=>s+(w.duration||0),0):0;
+    const shortWakings=lastNight?(lastNight.shortWakings||0):0;
+    let wakingNote='';
+    if(longWakings>0)wakingNote+=`<div style="font-size:.82rem;color:var(--warn);margin-top:.4rem">😴 ${t('awakeOvernight')}: ${fmtDur(longWakings)}</div>`;
+    if(shortWakings>0)wakingNote+=`<div style="font-size:.82rem;color:var(--muted);margin-top:.25rem">💤 ${t('shortWakingsNote',shortWakings)}</div>`;
     document.getElementById('lastNightSummary').innerHTML=`
       <div style="font-size:.85rem;color:var(--muted);margin-bottom:.3rem">${t('nightSleep')}</div>
       <div style="font-size:1.4rem;font-weight:700;color:var(--accent2)">${fmtDur(ln)} ${tag}</div>
-      ${wn}
-      <div class="sleep-bar-wrap">
-        <div class="sleep-bar-bg"><div class="sleep-bar ${col}" style="width:${p}%"></div></div>
-        <div class="bar-labels"><span>0</span><span>${t('goal')}: ${fmtDur(nt2)}</span></div>
-      </div>`;
+      ${wakingNote}
+      <div class="sleep-bar-wrap"><div class="sleep-bar-bg"><div class="sleep-bar ${col}" style="width:${p}%"></div></div>
+      <div class="bar-labels"><span>0</span><span>${t('goal')}: ${fmtDur(nt2)}</span></div></div>`;
   } else document.getElementById('lastNightSummary').innerHTML=`<div class="empty">${t('noNight')}</div>`;
 }
 
-// ── Render History ─────────────────────────────────────────────────────────
+// ── Render History ─────────────────────────────────────────────
 function renderHistory(){
   const el=document.getElementById('historyList');
-  const allDates=[...new Set(state.entries.map(e=>e.date))].sort((a,b)=>b.localeCompare(a)).slice(0,14);
+  const allDates=[...new Set(state.entries.map(e=>e.date))].sort((a,b)=>b.localeCompare(a)).slice(0,60);
   if(!allDates.length){el.innerHTML=`<div class="empty">${t('noHistory')}</div>`;return;}
   const rec=recSleep(state.settings.ageMonths);
   el.innerHTML=allDates.map(date=>{
@@ -472,124 +475,95 @@ function renderHistory(){
     const naps=state.entries.filter(e=>e.date===date&&e.type==='nap');
     const nightMins=nights.reduce((s,e)=>s+nightDuration(e),0);
     const napMins=naps.reduce((s,e)=>s+napDuration(e),0);
-    const wakings=nights.reduce((s,e)=>s+(e.wakings||[]).reduce((ss,w)=>ss+(w.duration||0),0),0);
+    const longWakings=nights.reduce((s,e)=>s+(e.wakings||[]).reduce((ss,w)=>ss+(w.duration||0),0),0);
+    const shortWakings=nights.reduce((s,e)=>s+(e.shortWakings||0),0);
     const total=nightMins+napMins;
     const label=fmtDateLabel(date);
     const tt=total>=rec.min*60?'tag-good':total>=rec.min*60*0.85?'tag-warn':'tag-bad';
     const tl=total>=rec.min*60?t('tagOnTrack'):total>=rec.min*60*0.85?t('tagShort'):t('tagPoor');
     const relaxed=isRelaxed(date);
-
-    // Nap pills for history
-    const napPills=naps.flatMap((e,ei)=>
-      (e.naps||[]).map((n,ni)=>
-        `<span class="nap-pill">${n.start}–${n.end}<span class="del-nap" onclick="deleteNap('${date}',${ei},${ni})" title="${t('deleteNap')}">✕</span></span>`
-      )
-    ).join('');
-
+    const napPills=naps.flatMap((e,ei)=>(e.naps||[]).map((n,ni)=>`<span class="nap-pill">${n.start}–${n.end}<span class="del-nap" onclick="deleteNap('${date}',${ei},${ni})" title="${t('deleteNap')}">✕</span></span>`)).join('');
     return`<div class="history-item">
       <div class="history-date">${label} <span class="tag ${tt}">${tl}</span>${relaxed?' <span class="tag tag-good">🛌</span>':''}</div>
       <div class="history-grid">
         <div class="history-stat">🌙 ${t('night')}: <span>${nightMins>0?fmtDur(nightMins):'—'}</span></div>
         <div class="history-stat">☀️ ${t('naps')}: <span>${napMins>0?fmtDur(napMins):'—'}</span></div>
         <div class="history-stat">📊 ${t('total')}: <span>${total>0?fmtDur(total):'—'}</span></div>
-        ${wakings>0?`<div class="history-stat">😴 ${t('awake')}: <span style="color:var(--warn)">${fmtDur(wakings)}</span></div>`:''}
+        ${longWakings>0?`<div class="history-stat">😴 ${t('awake')}: <span style="color:var(--warn)">${fmtDur(longWakings)}</span></div>`:''}
+        ${shortWakings>0?`<div class="history-stat">💤 ${lang==='da'?'Korte':'Brief'}: <span style="color:var(--muted)">${shortWakings}x</span></div>`:''}
       </div>
       ${napPills?`<div class="history-naps">${napPills}</div>`:''}
     </div>`;
   }).join('');
 }
 
-// ── Delete individual nap from history ────────────────────────────────────
-function deleteNap(date,entryIdx,napIdx){
+function deleteNap(date,ei,ni){
   const dayNaps=state.entries.filter(e=>e.date===date&&e.type==='nap');
-  if(!dayNaps[entryIdx])return;
-  dayNaps[entryIdx].naps.splice(napIdx,1);
-  if(dayNaps[entryIdx].naps.length===0){
-    state.entries=state.entries.filter(e=>e!==dayNaps[entryIdx]);
-  }
+  if(!dayNaps[ei])return;
+  dayNaps[ei].naps.splice(ni,1);
+  if(!dayNaps[ei].naps.length)state.entries=state.entries.filter(e=>e!==dayNaps[ei]);
   saveState();renderAll();
 }
 
-// ── Wakings UI ─────────────────────────────────────────────────────────────
+// ── Wakings ────────────────────────────────────────────────────
 let wakingCount=0;
 function addWaking(){
-  wakingCount++;
-  const id='waking_'+wakingCount;
-  const div=document.createElement('div');
-  div.className='waking-row';div.id=id;
-  div.innerHTML=`<input type="time" class="w-time"><input type="number" min="5" max="240" placeholder="min" class="w-dur" style="max-width:80px"><button class="remove-btn" onclick="document.getElementById('${id}').remove()">✕</button>`;
+  wakingCount++;const id='waking_'+wakingCount;
+  const div=document.createElement('div');div.className='waking-row';div.id=id;
+  div.innerHTML=`<input type="time" class="w-time"><input type="number" min="10" max="240" placeholder="min" class="w-dur" style="max-width:70px"><button class="remove-btn" onclick="document.getElementById('${id}').remove()">✕</button>`;
   document.getElementById('wakingsList').appendChild(div);
 }
 function getWakings(){
   return[...document.querySelectorAll('#wakingsList .waking-row')].map(r=>({
-    time:r.querySelector('.w-time').value,
-    duration:parseInt(r.querySelector('.w-dur').value)||0
+    time:r.querySelector('.w-time').value,duration:parseInt(r.querySelector('.w-dur').value)||0
   })).filter(w=>w.time&&w.duration>0);
 }
 
-// ── Naps UI ────────────────────────────────────────────────────────────────
+// ── Naps ───────────────────────────────────────────────────────
 let napCount=1;
 function addNap(){
-  napCount++;
-  const id='nap'+napCount;
-  const div=document.createElement('div');
-  div.className='nap-entry';div.id=id;
+  napCount++;const id='nap'+napCount;
+  const div=document.createElement('div');div.className='nap-entry';div.id=id;
   div.innerHTML=`<input type="time" id="${id}start"><span style="color:var(--muted)">–</span><input type="time" id="${id}end"><button class="remove-btn" onclick="document.getElementById('${id}').remove()">✕</button>`;
   document.getElementById('napsList').appendChild(div);
 }
 function removeNap(btn){btn.closest('.nap-entry').remove();}
 
-// ── Save Night ─────────────────────────────────────────────────────────────
+// ── Save Night ─────────────────────────────────────────────────
 function saveNight(){
   const date=document.getElementById('nightDate').value;
   const bed=document.getElementById('bedtime').value;
   const wake=document.getElementById('waketime').value;
   if(!date||!bed||!wake){showToast(t('fillFields'));return;}
+  const shortWakings=parseInt(document.getElementById('shortWakings').value)||0;
   state.entries=state.entries.filter(e=>!(e.date===date&&e.type==='night'));
-  state.entries.push({type:'night',date,bedtime:bed,waketime:wake,wakings:getWakings()});
+  state.entries.push({type:'night',date,bedtime:bed,waketime:wake,wakings:getWakings(),shortWakings});
   saveState();
   document.getElementById('wakingsList').innerHTML='';
+  document.getElementById('shortWakings').value='0';
   showToast(t('saved'));renderAll();
 }
 
-// ── Save Naps (APPEND mode) ────────────────────────────────────────────────
+// ── Save Naps ──────────────────────────────────────────────────
 function saveNaps(){
   const date=document.getElementById('napDate').value;
   if(!date){showToast(t('selectDate'));return;}
   const newNaps=[...document.querySelectorAll('#napsList .nap-entry')].map(row=>{
-    const inputs=row.querySelectorAll('input[type=time]');
-    return{start:inputs[0].value,end:inputs[1].value};
+    const inputs=row.querySelectorAll('input[type=time]');return{start:inputs[0].value,end:inputs[1].value};
   }).filter(n=>n.start&&n.end);
   if(!newNaps.length){showToast(t('addNap'));return;}
-
-  // Find existing nap entry for this date, or create one
   let existing=state.entries.find(e=>e.date===date&&e.type==='nap');
-  if(existing){
-    existing.naps=[...(existing.naps||[]),...newNaps];
-  } else {
-    state.entries.push({type:'nap',date,naps:newNaps});
-  }
+  if(existing)existing.naps=[...(existing.naps||[]),...newNaps];
+  else state.entries.push({type:'nap',date,naps:newNaps});
   saveState();
-
-  // Reset nap form to one empty row
   napCount=1;
-  document.getElementById('napsList').innerHTML=`<div class="nap-entry">
-    <input type="time" id="nap1start"><span style="color:var(--muted)">–</span>
-    <input type="time" id="nap1end"><button class="remove-btn" onclick="removeNap(this)">✕</button></div>`;
-
+  document.getElementById('napsList').innerHTML=`<div class="nap-entry"><input type="time" id="nap1start"><span style="color:var(--muted)">–</span><input type="time" id="nap1end"><button class="remove-btn" onclick="removeNap(this)">✕</button></div>`;
   showToast(t('napsSaved'));renderAll();
 }
 
-// ── Misc ───────────────────────────────────────────────────────────────────
-function clearData(){
-  if(confirm(t('confirmClear'))){state.entries=[];saveState();showToast(t('cleared'));renderAll();}
-}
+function clearData(){if(confirm(t('confirmClear'))){state.entries=[];saveState();showToast(t('cleared'));renderAll();}}
 function renderAll(){renderToday();renderHistory();}
-function showToast(msg){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2200);
-}
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
 function initDates(){
   const y=new Date();y.setDate(y.getDate()-1);
   document.getElementById('nightDate').value=y.toISOString().slice(0,10);
