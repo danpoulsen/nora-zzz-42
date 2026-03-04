@@ -174,6 +174,8 @@
     <input type="time" id="wakeGoal" value="07:00">
     <label id="lWinddown">Ro-ned-tid (minutter)</label>
     <input type="number" id="winddownMins" min="15" max="60" value="30">
+    <label id="lLastNapCutoff">Seneste sluttid for lur</label>
+    <input type="time" id="lastNapCutoff" value="17:00">
     <button class="btn btn-primary" id="btnSaveSettings" onclick="saveSettings()">Gem indstillinger</button>
   </div>
   <div class="card">
@@ -228,7 +230,7 @@ const T={
     historyTitle:"📋 Søvnhistorik",
     settingsTitle:"⚙️ Indstillinger",lAgeMo:"Noras alder (måneder)",
     lWakeGoal:"Mål for opvågning (hverdage)",lWinddown:"Ro-ned-tid (minutter)",
-    btnSaveSettings:"Gem indstillinger",dataTitle:"🗑️ Data",btnClearData:"Slet al søvndata",
+    lLastNapCutoff:"Seneste sluttid for lur",
     tabToday:"I dag",tabLog:"Log søvn",tabHistory:"Historik",
     weekendBadge:"🛌 Weekend – ingen fast opvågning",
     tagGood:"God",tagFair:"Okay",tagPoor:"For lidt",tagOnTrack:"På sporet",tagShort:"Lidt kort",tagVeryShort:"For kort",
@@ -240,6 +242,8 @@ const T={
     napTotal:"Samlet lurtid",nightSleep:"Nattesøvn (effektiv)",awakeOvernight:"Vågen om natten",
     shortWakingsNote:(n)=>`Kortvarige opvågninger: ${n}`,
     goal:"Mål",night:"Nat",naps:"Lure",total:"Total",awake:"Vågen",deleteNap:"Slet lur",
+    reasonWakeWindow:(end,bed)=>`Noras sidste lur sluttede ${end} – med 4½ times vågevinde foreslås sengetid ${bed}.`,
+    reasonSoftFloor:"Sengetid er justeret til tidligst 19:30 – tidligere end normalt, hold øje med træthedstegn.",
     reasonBase:(bed,wake)=>`Sengetid ${bed} giver Nora tid til at sove til opvågningsmålet ${wake}.`,
     reasonWeekend:"Weekend: ingen fast opvågning – Nora må sove til hun vågner naturligt.",
     reasonBadNight:"Noras samlede søvn i går (nat + lure) var kortere end anbefalet.",
@@ -267,7 +271,7 @@ const T={
     historyTitle:"📋 Sleep History",
     settingsTitle:"⚙️ Settings",lAgeMo:"Nora's age (months)",
     lWakeGoal:"Weekday wake-up goal",lWinddown:"Wind-down duration (minutes)",
-    btnSaveSettings:"Save Settings",dataTitle:"🗑️ Data",btnClearData:"Clear All Sleep Data",
+    lLastNapCutoff:"Latest nap end time",
     tabToday:"Today",tabLog:"Log Sleep",tabHistory:"History",
     weekendBadge:"🛌 Weekend – no set wake time",
     tagGood:"Good",tagFair:"Fair",tagPoor:"Too little",tagOnTrack:"On track",tagShort:"A bit short",tagVeryShort:"Very short",
@@ -279,6 +283,8 @@ const T={
     napTotal:"Total nap time",nightSleep:"Night sleep (effective)",awakeOvernight:"Awake overnight",
     shortWakingsNote:(n)=>`Brief wakings: ${n}`,
     goal:"Goal",night:"Night",naps:"Naps",total:"Total",awake:"Awake",deleteNap:"Delete nap",
+    reasonWakeWindow:(end,bed)=>`Nora's last nap ended at ${end} – with a 4.5hr wake window, bedtime is suggested at ${bed}.`,
+    reasonSoftFloor:"Bedtime adjusted to earliest 19:30 – earlier than usual, watch for tired signs.",
     reasonBase:(bed,wake)=>`Bedtime at ${bed} gives Nora enough time to sleep through to the ${wake} wake-up goal.`,
     reasonWeekend:"Weekend: no fixed wake time – Nora can sleep until she wakes naturally.",
     reasonBadNight:"Nora's total sleep yesterday (night + naps) was below the recommended amount.",
@@ -297,10 +303,10 @@ let lang='da';
 function t(key,...args){const v=T[lang][key];return typeof v==='function'?v(...args):(v??key);}
 function setLang(l){lang=l;document.getElementById('btnDA').classList.toggle('active',l==='da');document.getElementById('btnEN').classList.toggle('active',l==='en');applyTranslations();renderAll();}
 function applyTranslations(){
-  ['hdrTitle','sugTitle','todayNapTitle','lastNightTitle','logNightTitle','lNightDate','lBedtime','lWaketime',
+  const ids=['hdrTitle','sugTitle','todayNapTitle','lastNightTitle','logNightTitle','lNightDate','lBedtime','lWaketime',
    'wakingsTitle','btnAddWaking','btnSaveNight','lShortWakings','logNapTitle','lNapDate','btnAddNap','btnSaveNaps',
-   'napInfoNote','historyTitle','settingsTitle','lAgeMo','lWakeGoal','lWinddown','btnSaveSettings','dataTitle','btnClearData']
-  .forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t(id);});
+   'napInfoNote','historyTitle','settingsTitle','lAgeMo','lWakeGoal','lWinddown','lLastNapCutoff','btnSaveSettings','dataTitle','btnClearData'];
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t(id);});
   document.getElementById('tab-today').textContent=t('tabToday');
   document.getElementById('tab-log').textContent=t('tabLog');
   document.getElementById('tab-history').textContent=t('tabHistory');
@@ -340,12 +346,14 @@ function applySettings(){
   document.getElementById('ageMonths').value=s.ageMonths;
   document.getElementById('wakeGoal').value=s.wakeGoal;
   document.getElementById('winddownMins').value=s.winddownMins;
+  document.getElementById('lastNapCutoff').value=s.lastNapCutoff||'17:00';
   document.getElementById('ageDisplay').textContent=s.ageMonths+' '+t('ageUnit');
 }
 function saveSettings(){
   state.settings.ageMonths=parseInt(document.getElementById('ageMonths').value)||14;
   state.settings.wakeGoal=document.getElementById('wakeGoal').value;
   state.settings.winddownMins=parseInt(document.getElementById('winddownMins').value)||30;
+  state.settings.lastNapCutoff=document.getElementById('lastNapCutoff').value||'17:00';
   saveState();applySettings();showToast(t('settingsSaved'));showPage('today');
 }
 
@@ -439,6 +447,12 @@ function computeSuggestions(){
   if(checkin === 'tired') checkinAdjust = -20;
   else if(checkin === 'fresh') checkinAdjust = 20;
   idealBedMins += checkinAdjust;
+
+  // Hard floor and ceiling on bedtime suggestion
+  const bedFloor = 20 * 60; // 20:00
+  const bedCeiling = 22 * 60; // 22:00
+  if(idealBedMins < bedFloor) idealBedMins = bedFloor;
+  if(idealBedMins > bedCeiling) idealBedMins = bedCeiling;
 
   const winddownMins=idealBedMins-s.winddownMins;
 
