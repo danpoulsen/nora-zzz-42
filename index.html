@@ -22,14 +22,16 @@
   .tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);}
   .tab{flex:1;padding:.75rem;text-align:center;font-size:.85rem;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
   .tab.active{color:var(--accent2);border-bottom-color:var(--accent);}
-  .page{display:none;padding:1rem;max-width:480px;margin:0 auto;}
+  .page{display:none;padding:1rem;max-width:480px;margin:0 auto;overflow-x:hidden;}
+  .card{overflow:hidden;}
   .page.active{display:block;}
   .card{background:var(--card);border-radius:14px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border);}
   label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:.35rem;margin-top:.7rem;}
   label:first-child{margin-top:0;}
   input[type=time],input[type=number],input[type=date],select{
-    width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;
+    width:100%;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;
     color:var(--text);padding:.6rem .75rem;font-size:1rem;outline:none;
+    -webkit-appearance:none;appearance:none;
   }
   input:focus{border-color:var(--accent);}
   .btn{display:block;width:100%;padding:.85rem;border-radius:10px;border:none;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:1rem;}
