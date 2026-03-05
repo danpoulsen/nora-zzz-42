@@ -5,81 +5,112 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Noras Søvn 🌙</title>
 <style>
-  :root{--bg:#0f0c1a;--card:#1a1630;--card2:#221e38;--accent:#7c6af7;--accent2:#b59eff;--warn:#f7a76c;--good:#6cf7a8;--bad:#f76c6c;--text:#e8e4ff;--muted:#8880aa;--border:#2e2a4a;}
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
-  h2{font-size:1rem;font-weight:600;color:var(--accent2);margin-bottom:.75rem;}
-  .header{background:var(--card);padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
-  .header-left h1{font-size:1.3rem;font-weight:700;}
-  .header-right{display:flex;gap:.5rem;align-items:center;}
-  .lang-btn{background:var(--card2);border:1px solid var(--border);color:var(--accent2);border-radius:8px;padding:.35rem .7rem;font-size:.8rem;font-weight:600;cursor:pointer;}
-  .lang-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);}
-  .tab{flex:1;padding:.75rem;text-align:center;font-size:.85rem;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
-  .tab.active{color:var(--accent2);border-bottom-color:var(--accent);}
-  .page{display:none;padding:1rem;max-width:480px;margin:0 auto;overflow-x:hidden;}
-  .page.active{display:block;}
-  .card{background:var(--card);border-radius:14px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border);overflow:hidden;}
-  label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:.35rem;margin-top:.7rem;}
-  label:first-child{margin-top:0;}
-  input[type=time],input[type=number],input[type=date],select{width:100%;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.6rem .75rem;font-size:1rem;outline:none;-webkit-appearance:none;appearance:none;}
-  input:focus{border-color:var(--accent);}
-  .btn{display:block;width:100%;padding:.85rem;border-radius:10px;border:none;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:1rem;}
-  .btn:active{opacity:.8;}
-  .btn-primary{background:var(--accent);color:#fff;}
-  .btn-secondary{background:var(--card2);color:var(--accent2);border:1px solid var(--border);}
-  .btn-small{display:inline-block;width:auto;padding:.4rem .9rem;font-size:.82rem;margin-top:0;}
-  .btn-danger{background:#3a1a1a;color:var(--bad);border:1px solid #5a2a2a;}
-  .suggestion-box{background:linear-gradient(135deg,#1e1a40,#2a1e50);border:1px solid var(--accent);border-radius:14px;padding:1rem;margin-bottom:1rem;}
-  .sug-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);}
-  .sug-row:last-child{border-bottom:none;}
-  .sug-label{font-size:.82rem;color:var(--muted);}
-  .sug-val{font-size:1.1rem;font-weight:700;color:var(--accent2);}
-  .sug-val.warn{color:var(--warn);}
-  .reason-box{background:#1a1828;border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:.75rem .9rem;margin-top:.75rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
-  .reason-item{margin-bottom:.3rem;}
-  .reason-item:last-child{margin-bottom:0;}
-  .weekend-badge{display:inline-block;background:#1e2a1a;color:var(--good);border:1px solid #2e4a2a;border-radius:99px;padding:.2rem .7rem;font-size:.78rem;font-weight:600;margin-bottom:.6rem;}
-  .sleep-bar-wrap{margin:.6rem 0 .2rem;}
-  .sleep-bar-bg{background:var(--bg);border-radius:99px;height:10px;overflow:hidden;}
-  .sleep-bar{height:10px;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;}
-  .sleep-bar.warn{background:linear-gradient(90deg,var(--warn),#f7c46c);}
-  .sleep-bar.bad{background:linear-gradient(90deg,var(--bad),var(--warn));}
-  .bar-labels{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:.25rem;}
-  .tag{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.75rem;font-weight:600;margin-right:.3rem;}
-  .tag-good{background:#0d2e1e;color:var(--good);}
-  .tag-warn{background:#2e1e0d;color:var(--warn);}
-  .tag-bad{background:#2e0d0d;color:var(--bad);}
-  .history-item{background:var(--card);border-radius:12px;padding:.85rem;margin-bottom:.75rem;border:1px solid var(--border);}
-  .history-date{font-size:.78rem;color:var(--muted);margin-bottom:.5rem;}
-  .history-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem .8rem;}
-  .history-stat{font-size:.82rem;}
-  .history-stat span{color:var(--accent2);font-weight:600;}
-  .history-naps{margin-top:.5rem;font-size:.78rem;color:var(--muted);}
-  .nap-pill{display:inline-block;background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:.15rem .55rem;margin:.15rem .15rem 0 0;font-size:.75rem;color:var(--accent2);}
-  .nap-pill .del-nap{color:var(--bad);cursor:pointer;margin-left:.3rem;font-size:.8rem;}
-  .waking-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
-  .waking-row input{flex:1;min-width:0;}
-  .remove-btn{background:#3a1a1a;color:var(--bad);border:1px solid #5a2a2a;border-radius:8px;padding:.45rem .7rem;font-size:.9rem;cursor:pointer;flex-shrink:0;}
-  .add-btn{background:var(--card2);color:var(--accent2);border:1px solid var(--border);border-radius:8px;padding:.5rem 1rem;font-size:.83rem;cursor:pointer;margin-top:.25rem;}
-  .nap-entry{display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;}
-  .nap-entry input{flex:1;min-width:0;}
-  .divider{height:1px;background:var(--border);margin:.75rem 0;}
-  .section-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;}
-  .short-waking-row{display:flex;align-items:center;gap:.75rem;margin-top:.5rem;}
-  .short-waking-row label{margin:0;white-space:nowrap;font-size:.82rem;color:var(--muted);}
-  .empty{text-align:center;color:var(--muted);padding:2rem 1rem;font-size:.9rem;}
-  .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:.65rem 1.4rem;border-radius:99px;font-size:.9rem;font-weight:600;opacity:0;transition:opacity .3s;z-index:100;pointer-events:none;white-space:nowrap;}
-  .toast.show{opacity:1;}
-  .age-display{font-size:.82rem;color:var(--muted);margin-top:.15rem;}
-  .age-display strong{color:var(--accent2);}
-  .checkin-btn{flex:1;padding:.6rem .5rem;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-size:.88rem;cursor:pointer;transition:all .2s;font-weight:600;}
-  .checkin-btn.active-tired{background:#2e1e0d;color:var(--warn);border-color:var(--warn);}
-  .checkin-btn.active-okay{background:#1e1a40;color:var(--accent2);border-color:var(--accent);}
-  .checkin-btn.active-fresh{background:#0d2e1e;color:var(--good);border-color:var(--good);}
-  .sync-indicator{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem;transition:color .3s;}
-  .sync-indicator.syncing{color:var(--warn);}
-  .sync-indicator.synced{color:var(--good);}
+:root{--bg:#0f0c1a;--card:#1a1630;--card2:#221e38;--accent:#7c6af7;--accent2:#b59eff;--warn:#f7a76c;--good:#6cf7a8;--bad:#f76c6c;--text:#e8e4ff;--muted:#8880aa;--border:#2e2a4a;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
+h2{font-size:1rem;font-weight:600;color:var(--accent2);margin-bottom:.75rem;}
+.header{background:var(--card);padding:.85rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+.header-left h1{font-size:1.3rem;font-weight:700;}
+.header-right{display:flex;gap:.5rem;align-items:center;}
+.lang-btn{background:var(--card2);border:1px solid var(--border);color:var(--accent2);border-radius:8px;padding:.35rem .7rem;font-size:.8rem;font-weight:600;cursor:pointer;}
+.lang-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto;}
+.tab{flex:1;min-width:60px;padding:.7rem .5rem;text-align:center;font-size:.8rem;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent);}
+.page{display:none;padding:1rem;max-width:480px;margin:0 auto;overflow-x:hidden;}
+.page.active{display:block;}
+.card{background:var(--card);border-radius:14px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border);overflow:hidden;}
+label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:.35rem;margin-top:.7rem;}
+label:first-child{margin-top:0;}
+input[type=time],input[type=number],input[type=date],input[type=text]{width:100%;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.6rem .75rem;font-size:1rem;outline:none;-webkit-appearance:none;appearance:none;}
+input:focus{border-color:var(--accent);}
+.btn{display:block;width:100%;padding:.85rem;border-radius:10px;border:none;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:1rem;}
+.btn:active{opacity:.8;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-secondary{background:var(--card2);color:var(--accent2);border:1px solid var(--border);}
+.btn-small{display:inline-block;width:auto;padding:.4rem .9rem;font-size:.82rem;margin-top:0;}
+.btn-danger{background:#3a1a1a;color:var(--bad);border:1px solid #5a2a2a;}
+.btn-sleep{background:linear-gradient(135deg,#2a1e50,#1e1a40);border:2px solid var(--accent);color:var(--accent2);font-size:1.1rem;padding:1.1rem;border-radius:14px;}
+.btn-sleep.active-sleep{background:linear-gradient(135deg,#1a2e1a,#1a2a1a);border-color:var(--good);color:var(--good);}
+.btn-brief{background:#221e38;border:1px solid var(--border);color:var(--warn);font-size:.9rem;padding:.7rem;border-radius:10px;margin-top:.5rem;}
+.suggestion-box{background:linear-gradient(135deg,#1e1a40,#2a1e50);border:1px solid var(--accent);border-radius:14px;padding:1rem;margin-bottom:1rem;}
+.sug-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);}
+.sug-row:last-child{border-bottom:none;}
+.sug-label{font-size:.82rem;color:var(--muted);}
+.sug-val{font-size:1.1rem;font-weight:700;color:var(--accent2);}
+.sug-val.warn{color:var(--warn);}
+.reason-box{background:#1a1828;border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:.75rem .9rem;margin-top:.75rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
+.reason-item{margin-bottom:.3rem;}
+.reason-item:last-child{margin-bottom:0;}
+.weekend-badge{display:inline-block;background:#1e2a1a;color:var(--good);border:1px solid #2e4a2a;border-radius:99px;padding:.2rem .7rem;font-size:.78rem;font-weight:600;margin-bottom:.6rem;}
+.sleep-bar-wrap{margin:.6rem 0 .2rem;}
+.sleep-bar-bg{background:var(--bg);border-radius:99px;height:10px;overflow:hidden;}
+.sleep-bar{height:10px;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;}
+.sleep-bar.warn{background:linear-gradient(90deg,var(--warn),#f7c46c);}
+.sleep-bar.bad{background:linear-gradient(90deg,var(--bad),var(--warn));}
+.bar-labels{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:.25rem;}
+.tag{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.75rem;font-weight:600;margin-right:.3rem;}
+.tag-good{background:#0d2e1e;color:var(--good);}
+.tag-warn{background:#2e1e0d;color:var(--warn);}
+.tag-bad{background:#2e0d0d;color:var(--bad);}
+.history-item{background:var(--card);border-radius:12px;padding:.85rem;margin-bottom:.75rem;border:1px solid var(--border);}
+.history-date{font-size:.78rem;color:var(--muted);margin-bottom:.5rem;}
+.history-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem .8rem;}
+.history-stat{font-size:.82rem;}
+.history-stat span{color:var(--accent2);font-weight:600;}
+.history-naps{margin-top:.5rem;font-size:.78rem;color:var(--muted);}
+.nap-pill{display:inline-block;background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:.15rem .55rem;margin:.15rem .15rem 0 0;font-size:.75rem;color:var(--accent2);}
+.nap-pill .del-nap{color:var(--bad);cursor:pointer;margin-left:.3rem;font-size:.8rem;}
+.waking-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+.waking-row input{flex:1;min-width:0;}
+.remove-btn{background:#3a1a1a;color:var(--bad);border:1px solid #5a2a2a;border-radius:8px;padding:.45rem .7rem;font-size:.9rem;cursor:pointer;flex-shrink:0;}
+.add-btn{background:var(--card2);color:var(--accent2);border:1px solid var(--border);border-radius:8px;padding:.5rem 1rem;font-size:.83rem;cursor:pointer;margin-top:.25rem;}
+.nap-entry{display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;}
+.nap-entry input{flex:1;min-width:0;}
+.divider{height:1px;background:var(--border);margin:.75rem 0;}
+.section-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;}
+.short-waking-row{display:flex;align-items:center;gap:.75rem;margin-top:.5rem;}
+.short-waking-row label{margin:0;white-space:nowrap;font-size:.82rem;color:var(--muted);}
+.checkin-btn{flex:1;padding:.6rem .5rem;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-size:.88rem;cursor:pointer;transition:all .2s;font-weight:600;}
+.checkin-btn.active-tired{background:#2e1e0d;color:var(--warn);border-color:var(--warn);}
+.checkin-btn.active-okay{background:#1e1a40;color:var(--accent2);border-color:var(--accent);}
+.checkin-btn.active-fresh{background:#0d2e1e;color:var(--good);border-color:var(--good);}
+.mood-btn{flex:1;padding:.55rem .3rem;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-weight:600;text-align:center;}
+.mood-btn.active{background:#1e1a40;color:var(--accent2);border-color:var(--accent);}
+.empty{text-align:center;color:var(--muted);padding:2rem 1rem;font-size:.9rem;}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:.65rem 1.4rem;border-radius:99px;font-size:.9rem;font-weight:600;opacity:0;transition:opacity .3s;z-index:100;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+.age-display{font-size:.82rem;color:var(--muted);margin-top:.15rem;}
+.age-display strong{color:var(--accent2);}
+.info-note{font-size:.78rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
+.sync-indicator{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem;transition:color .3s;}
+.sync-indicator.syncing{color:var(--warn);}
+.sync-indicator.synced{color:var(--good);}
+.fact-box{background:var(--card2);border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem;border:1px solid var(--border);font-size:.83rem;color:var(--muted);line-height:1.5;text-align:center;}
+.fact-box .fact-emoji{font-size:1.4rem;display:block;margin-bottom:.4rem;}
+.timer-display{font-size:2rem;font-weight:700;color:var(--accent2);text-align:center;padding:.5rem 0;letter-spacing:.05em;}
+.timer-label{font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:.5rem;}
+.live-session{background:linear-gradient(135deg,#1a2e1a,#1a2a1a);border:2px solid var(--good);border-radius:14px;padding:1rem;margin-bottom:1rem;}
+.daycare-days{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
+.day-btn{padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-size:.82rem;cursor:pointer;font-weight:600;}
+.day-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.sick-banner{background:#2e0d0d;border:1px solid #5a2a2a;border-radius:10px;padding:.6rem 1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--bad);}
+/* Weekly chart */
+.chart-wrap{margin:.5rem 0;}
+.chart-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;}
+.chart-day{font-size:.72rem;color:var(--muted);width:28px;flex-shrink:0;text-align:right;}
+.chart-bars{flex:1;display:flex;flex-direction:column;gap:2px;}
+.chart-bar-night{height:8px;border-radius:3px 0 0 3px;background:var(--accent);min-width:2px;transition:width .4s;}
+.chart-bar-nap{height:8px;border-radius:0 3px 3px 0;background:var(--accent2);opacity:.7;min-width:2px;transition:width .4s;}
+.chart-bar-wrap{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--bg);}
+.chart-val{font-size:.7rem;color:var(--muted);width:32px;flex-shrink:0;}
+.chart-mood{font-size:.85rem;width:20px;flex-shrink:0;text-align:center;}
+.chart-wakes{font-size:.68rem;color:var(--warn);width:20px;flex-shrink:0;text-align:center;}
+.week-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.75rem;}
+.week-stat{background:var(--card2);border-radius:10px;padding:.6rem;text-align:center;}
+.week-stat-val{font-size:1.1rem;font-weight:700;color:var(--accent2);}
+.week-stat-label{font-size:.7rem;color:var(--muted);margin-top:.2rem;}
+.settings-section{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:.75rem 0 .4rem;}
 </style>
 </head>
 <body>
@@ -96,13 +127,19 @@
 </div>
 <div class="tabs">
   <div class="tab active" id="tab-today" onclick="showPage('today')">I dag</div>
-  <div class="tab" id="tab-log" onclick="showPage('log')">Log søvn</div>
+  <div class="tab" id="tab-track" onclick="showPage('track')">Tracker</div>
+  <div class="tab" id="tab-log" onclick="showPage('log')">Log</div>
+  <div class="tab" id="tab-week" onclick="showPage('week')">Uge</div>
   <div class="tab" id="tab-history" onclick="showPage('history')">Historik</div>
 </div>
 <div class="sync-indicator" id="syncIndicator">⟳ Forbinder...</div>
 
 <!-- TODAY -->
 <div id="page-today" class="page active">
+  <div id="sickBanner" style="display:none" class="sick-banner">
+    <span>🤒 <span id="sickLabel">Nora er syg i dag</span></span>
+    <button onclick="toggleSick()" style="background:none;border:none;color:var(--bad);cursor:pointer;font-size:.85rem;" id="sickToggleBtn">Fjern</button>
+  </div>
   <div class="suggestion-box">
     <h2 id="sugTitle">✨ Anbefalinger til i aften</h2>
     <div id="suggestionsContent"></div>
@@ -110,14 +147,65 @@
   </div>
   <div class="card" id="checkinCard" style="display:none">
     <h2 id="checkinTitle">🌡️ Hvordan er Nora?</h2>
-    <div style="display:flex;gap:.5rem;margin-bottom:.25rem">
+    <div style="display:flex;gap:.5rem">
       <button class="checkin-btn" id="cbTired" onclick="setCheckin('tired')">😴 Træt</button>
       <button class="checkin-btn" id="cbOkay" onclick="setCheckin('okay')">😐 Okay</button>
       <button class="checkin-btn" id="cbFresh" onclick="setCheckin('fresh')">😄 Frisk</button>
     </div>
   </div>
+  <div class="card" id="moodCard" style="display:none">
+    <h2 id="moodTitle">😊 Noras humør i dag</h2>
+    <div style="display:flex;gap:.4rem">
+      <button class="mood-btn" id="mb1" onclick="setMood('great')">😄</button>
+      <button class="mood-btn" id="mb2" onclick="setMood('good')">🙂</button>
+      <button class="mood-btn" id="mb3" onclick="setMood('okay')">😐</button>
+      <button class="mood-btn" id="mb4" onclick="setMood('tired')">😴</button>
+      <button class="mood-btn" id="mb5" onclick="setMood('cranky')">😤</button>
+    </div>
+  </div>
   <div class="card"><h2 id="todayNapTitle">☀️ Lure i dag</h2><div id="todaySummary"></div></div>
   <div class="card"><h2 id="lastNightTitle">🌙 Sidste nat</h2><div id="lastNightSummary"></div></div>
+  <div class="fact-box" id="factBox" style="display:none">
+    <span class="fact-emoji" id="factEmoji"></span>
+    <span id="factText"></span>
+  </div>
+  <div style="text-align:center;margin-bottom:.5rem">
+    <button class="btn btn-secondary btn-small" onclick="toggleSick()" id="sickBtn">🤒 <span id="sickBtnLabel">Nora er syg</span></button>
+  </div>
+</div>
+
+<!-- TRACKER -->
+<div id="page-track" class="page">
+  <div id="liveSessionBox" style="display:none" class="live-session">
+    <div class="timer-label" id="timerLabel">Sover siden</div>
+    <div class="timer-display" id="timerDisplay">00:00:00</div>
+    <div style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:.5rem" id="sleepingSince"></div>
+    <button class="btn btn-brief" id="btnBriefWake" onclick="logBriefWake()">💤 <span id="briefWakeLabel">Vågnede kort</span></button>
+    <button class="btn btn-primary" style="margin-top:.5rem" id="btnWakeUp" onclick="showEndSleep()">☀️ <span id="wakeUpLabel">Vågen</span></button>
+  </div>
+  <div id="startSleepBox">
+    <div class="card">
+      <h2 id="trackTitle">🌙 Start søvn</h2>
+      <label id="lSleepStart">Hvornår faldt hun i søvn?</label>
+      <input type="date" id="trackStartDate">
+      <input type="time" id="trackStartTime" style="margin-top:.5rem">
+      <button class="btn btn-sleep" id="btnStartSleep" onclick="startSleep()">😴 <span id="startSleepLabel">Sover nu</span></button>
+    </div>
+  </div>
+  <div id="endSleepBox" style="display:none">
+    <div class="card">
+      <h2 id="endSleepTitle">☀️ Afslut søvn</h2>
+      <label id="lSleepEnd">Hvornår vågnede hun?</label>
+      <input type="date" id="trackEndDate">
+      <input type="time" id="trackEndTime" style="margin-top:.5rem">
+      <button class="btn btn-primary" id="btnConfirmWake" onclick="confirmEndSleep()">✓ <span id="confirmWakeLabel">Bekræft opvågning</span></button>
+      <button class="btn btn-secondary" onclick="cancelEndSleep()" id="btnCancelWake">Annuller</button>
+    </div>
+  </div>
+  <div class="card" id="briefWakesCard" style="display:none">
+    <h2 id="briefWakesTitle">💤 Korte opvågninger i nat</h2>
+    <div id="briefWakesList"></div>
+  </div>
 </div>
 
 <!-- LOG -->
@@ -141,7 +229,7 @@
     <button class="btn btn-primary" id="btnSaveNight" onclick="saveNight()">Gem nattesøvn</button>
   </div>
   <div class="card">
-    <h2 id="logNapTitle">☀️ Log lur</h2>
+    <h2 id="logNapTitle">☀️ Log lur (manuel)</h2>
     <label id="lNapDate">Dato</label>
     <input type="date" id="napDate">
     <div id="napsList">
@@ -158,6 +246,12 @@
   </div>
 </div>
 
+<!-- WEEK -->
+<div id="page-week" class="page">
+  <h2 id="weekTitle" style="margin-bottom:1rem">📊 Ugeoversigt</h2>
+  <div id="weekContent"></div>
+</div>
+
 <!-- HISTORY -->
 <div id="page-history" class="page">
   <h2 id="historyTitle" style="margin-bottom:1rem">📋 Søvnhistorik</h2>
@@ -167,15 +261,22 @@
 <!-- SETTINGS -->
 <div id="page-settings" class="page">
   <div class="card">
-    <h2 id="settingsTitle">⚙️ Indstillinger</h2>
-    <label id="lAgeMo">Noras alder (måneder)</label>
-    <input type="number" id="ageMonths" min="1" max="36" value="14">
+    <h2 id="settingsTitle">⚙️ Nora</h2>
+    <label id="lBirthday">Noras fødselsdag</label>
+    <input type="date" id="birthday">
     <label id="lWakeGoal">Mål for opvågning (hverdage)</label>
     <input type="time" id="wakeGoal" value="07:00">
     <label id="lWinddown">Ro-ned-tid (minutter)</label>
     <input type="number" id="winddownMins" min="15" max="60" value="30">
     <label id="lLastNapCutoff">Seneste sluttid for lur</label>
     <input type="time" id="lastNapCutoff" value="17:00">
+  </div>
+  <div class="card">
+    <h2 id="daycareTitle">🏫 Vuggestue/dagpleje</h2>
+    <div class="settings-section" id="daycareDaysLabel">Dage i dagpleje</div>
+    <div class="daycare-days" id="daycareDaysBtns"></div>
+  </div>
+  <div class="card">
     <button class="btn btn-primary" id="btnSaveSettings" onclick="saveSettings()">Gem indstillinger</button>
   </div>
   <div class="card">
@@ -187,33 +288,50 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION = '1.8';
+const APP_VERSION='1.0';
+
+// ── Firebase ───────────────────────────────────────────────────
 const FB_URL='https://nora-zzz-42-default-rtdb.europe-west1.firebasedatabase.app/nora2024xk9';
-
-async function fbGet(){
-  try{
-    const r=await fetch(FB_URL+'.json');
-    if(!r.ok)return null;
-    return await r.json();
-  }catch(e){return null;}
-}
-async function fbSet(data){
-  try{
-    const r=await fetch(FB_URL+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-    return r.ok;
-  }catch(e){return false;}
-}
-
-function setSyncStatus(status){
+async function fbGet(){try{const r=await fetch(FB_URL+'.json');return r.ok?await r.json():null;}catch(e){return null;}}
+async function fbSet(data){try{const r=await fetch(FB_URL+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return r.ok;}catch(e){return false;}}
+function setSyncStatus(s){
   const el=document.getElementById('syncIndicator');
-  if(status==='syncing'){el.textContent='⟳ Gemmer...';el.className='sync-indicator syncing';}
-  else if(status==='synced'){el.textContent='✓ Synkroniseret';el.className='sync-indicator synced';setTimeout(()=>{el.textContent='';el.className='sync-indicator';},2000);}
-  else if(status==='connecting'){el.textContent='⟳ Forbinder...';el.className='sync-indicator';}
-  else if(status==='error'){el.textContent='⚠ Kunne ikke synkronisere';el.className='sync-indicator';el.style.color='var(--bad)';}
+  if(s==='syncing'){el.textContent='⟳ Gemmer...';el.className='sync-indicator syncing';}
+  else if(s==='synced'){el.textContent='✓ Synkroniseret';el.className='sync-indicator synced';setTimeout(()=>{el.textContent='';el.className='sync-indicator';},2000);}
+  else if(s==='connecting'){el.textContent='⟳ Forbinder...';el.className='sync-indicator';}
+  else if(s==='error'){el.textContent='⚠ Fejl';el.className='sync-indicator';el.style.color='var(--bad)';}
   else{el.textContent='';el.className='sync-indicator';}
 }
 
 // ── Translations ───────────────────────────────────────────────
+const DAYS_DA=['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
+const DAYS_EN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT_DA=['Søn','Man','Tir','Ons','Tor','Fre','Lør'];
+const DAYS_SHORT_EN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const FACTS=[
+  {e:'🧠',da:'Babyers hjerner vokser med 1% om dagen i det første leveår!',en:"Babies' brains grow by 1% every single day in the first year of life!"},
+  {e:'😴',da:'Søvn hjælper Noras hjerne med at sortere og gemme alt det nye, hun har lært i dag.',en:"Sleep helps Nora's brain sort and store everything she learned today."},
+  {e:'🌙',da:'Små børn drømmer faktisk mere end voksne – op til 50% af deres søvn er REM-søvn.',en:'Small children actually dream more than adults – up to 50% of their sleep is REM sleep.'},
+  {e:'👶',da:'Et barn på Noras alder har allerede lært mere end noget universitet kunne lære dem.',en:"A child Nora's age has already learned more than any university could teach them."},
+  {e:'🎵',da:'Børn husker melodier bedre end ord – synge godnatssange virker faktisk!',en:'Children remember melodies better than words – singing lullabies actually works!'},
+  {e:'🌟',da:'Noras smil aktiverer de samme dele af din hjerne som chokolade og penge.',en:"Nora's smile activates the same parts of your brain as chocolate and money."},
+  {e:'🤗',da:'Et knus fra et barn sænker dit stressniveau på bare 20 sekunder.',en:'A hug from a child lowers your stress levels in just 20 seconds.'},
+  {e:'💤',da:'Når børn sover, frigiver de væksthormoner – søvn er bogstaveligt talt vækst!',en:'When children sleep, they release growth hormones – sleep is literally growth!'},
+  {e:'🌈',da:'Spædbørn kan se farver efter ca. 3 måneder – Noras verden er nu meget mere farverig!',en:'Babies can see colors at around 3 months – Nora\'s world is now much more colorful!'},
+  {e:'🐣',da:'Børn er de eneste pattedyr, der griner, mens de bliver kildret.',en:'Children are the only mammals that laugh when being tickled.'},
+  {e:'❤️',da:'Din babys hjerte slår til næsten samme rytme som dit, når I holder øjenkontakt.',en:"Your baby's heart rate syncs to nearly the same rhythm as yours when you make eye contact."},
+  {e:'🌿',da:'Børn, der leger udenfor, sover 20% bedre om natten.',en:'Children who play outside sleep 20% better at night.'},
+  {e:'📚',da:'Hvis du læser for Nora i bare 15 minutter om dagen, hører hun 1 million ord ekstra om året.',en:'Reading to Nora for just 15 minutes a day exposes her to 1 million extra words per year.'},
+  {e:'🎭',da:'Børn griner i gennemsnit 400 gange om dagen. Voksne kun 15. Lad os lære af dem!',en:'Children laugh an average of 400 times a day. Adults only 15. Let\'s learn from them!'},
+  {e:'🦋',da:'Noras nysgerrighed er hendes superkraft – hvert spørgsmål bygger nye forbindelser i hjernen.',en:"Nora's curiosity is her superpower – every question builds new connections in her brain."},
+  {e:'🌙',da:'En godt udhvilet baby er en gladere baby – og gladere forældre!',en:'A well-rested baby is a happier baby – and happier parents!'},
+  {e:'🍼',da:'Spædbørn foretrækker ansigter frem for alt andet visuelt – Nora elsker at se på dig!',en:'Babies prefer faces over everything else visually – Nora loves looking at you!'},
+  {e:'🎨',da:'Kreativt leg er faktisk hjernens måde at behandle og forstå verden på.',en:"Creative play is actually the brain's way of processing and understanding the world."},
+  {e:'💫',da:'Søvnmangel er en af de sværeste dele af forældreskab – I gør det fantastisk!',en:'Sleep deprivation is one of the hardest parts of parenting – you\'re doing amazing!'},
+  {e:'🌸',da:'Børn, der har faste rutiner, sover hurtigere i søvn og vågner sjældnere om natten.',en:'Children with consistent routines fall asleep faster and wake less often at night.'},
+];
+
 const T={
   da:{
     hdrTitle:"Noras Søvn",ageUnit:"måneder",
@@ -224,37 +342,51 @@ const T={
     lBedtime:"Sengetid (hvornår faldt hun i søvn)",lWaketime:"Vågnetid",
     wakingsTitle:"NATLIGE OPVÅGNINGER",btnAddWaking:"+ Tilføj lang opvågning",btnSaveNight:"Gem nattesøvn",
     lShortWakings:"Korte opvågninger (<10 min):",
-    logNapTitle:"☀️ Log lur",lNapDate:"Dato",
+    logNapTitle:"☀️ Log lur (manuel)",lNapDate:"Dato",
     btnAddNap:"+ Tilføj endnu en lur",btnSaveNaps:"Gem lure",
     napInfoNote:"Lure tilføjes til eksisterende lure for den valgte dato.",
-    historyTitle:"📋 Søvnhistorik",
-    settingsTitle:"⚙️ Indstillinger",lAgeMo:"Noras alder (måneder)",
+    weekTitle:"📊 Ugeoversigt",historyTitle:"📋 Søvnhistorik",
+    settingsTitle:"⚙️ Nora",lBirthday:"Noras fødselsdag",
     lWakeGoal:"Mål for opvågning (hverdage)",lWinddown:"Ro-ned-tid (minutter)",
     lLastNapCutoff:"Seneste sluttid for lur",
-    tabToday:"I dag",tabLog:"Log søvn",tabHistory:"Historik",
+    daycareTitle:"🏫 Vuggestue/dagpleje",daycareDaysLabel:"Dage i dagpleje",
+    btnSaveSettings:"Gem indstillinger",dataTitle:"🗑️ Data",btnClearData:"Slet al søvndata",
+    tabToday:"I dag",tabTrack:"Tracker",tabLog:"Log",tabWeek:"Uge",tabHistory:"Historik",
     weekendBadge:"🛌 Weekend – ingen fast opvågning",
+    daycareBadge:"🏫 Dagpleje",
     tagGood:"God",tagFair:"Okay",tagPoor:"For lidt",tagOnTrack:"På sporet",tagShort:"Lidt kort",tagVeryShort:"For kort",
     noNaps:"Ingen lure logget endnu i dag",noNight:"Ingen nattesøvn logget endnu",
-    noHistory:"Ingen søvndata endnu.\nTryk på 'Log søvn' for at komme i gang.",
+    noHistory:"Ingen søvndata endnu.",noWeekData:"Ingen data for denne uge endnu.",
     saved:"Gemt! ✓",napsSaved:"Lure gemt! ✓",settingsSaved:"Indstillinger gemt! ✓",cleared:"Data slettet",
     fillFields:"Udfyld venligst alle felter",selectDate:"Vælg en dato",addNap:"Tilføj mindst én lur",
     confirmClear:"Slet al søvndata? Dette kan ikke fortrydes.",
     napTotal:"Samlet lurtid",nightSleep:"Nattesøvn (effektiv)",awakeOvernight:"Vågen om natten",
     shortWakingsNote:(n)=>`Kortvarige opvågninger: ${n}`,
     goal:"Mål",night:"Nat",naps:"Lure",total:"Total",awake:"Vågen",deleteNap:"Slet lur",
+    trackTitle:"🌙 Start søvn",lSleepStart:"Hvornår faldt hun i søvn?",
+    startSleepLabel:"Sover nu",timerLabel:"Sover siden",
+    lSleepEnd:"Hvornår vågnede hun?",endSleepTitle:"☀️ Afslut søvn",
+    confirmWakeLabel:"Bekræft opvågning",btnCancelWake:"Annuller",
+    wakeUpLabel:"Vågen",briefWakeLabel:"Vågnede kort",
+    briefWakesTitle:"💤 Korte opvågninger i nat",
+    briefWakeLogged:"Kort opvågning logget",
+    sickLabel:"Nora er syg i dag",sickToggleBtn:"Fjern",sickBtnLabel:"Nora er syg",
+    checkinLabel:"Hvordan er Nora?",
+    checkinTired:"😴 Træt",checkinOkay:"😐 Okay",checkinFresh:"😄 Frisk",
+    moodTitle:"😊 Noras humør i dag",
+    weekAvgNight:"Gns. nat",weekAvgNap:"Gns. lur",weekAvgTotal:"Gns. total",
+    sickDay:"🤒 Syg",
     reasonWakeWindow:(end,bed)=>`Noras sidste lur sluttede ${end} – med 4½ times vågevinde foreslås sengetid ${bed}.`,
-    reasonSoftFloor:"Sengetid er justeret til tidligst 19:30 – tidligere end normalt, hold øje med træthedstegn.",
+    reasonSoftFloor:"Sengetid er justeret til tidligst 19:30 – hold øje med træthedstegn.",
     reasonBase:(bed,wake)=>`Sengetid ${bed} giver Nora tid til at sove til opvågningsmålet ${wake}.`,
     reasonWeekend:"Weekend: ingen fast opvågning – Nora må sove til hun vågner naturligt.",
     reasonBadNight:"Noras samlede søvn i går (nat + lure) var kortere end anbefalet.",
     reasonShortNap:"Lurene i dag var kortere end anbefalet.",
     reasonBothBad:"Kort samlet søvn i går og kort lur i dag – tidligere sengetid anbefales.",
-    reasonOneNap:"Kun én lur i dag – justeret lidt tidligere, men ikke for tidligt.",
+    reasonOneNap:"Kun én lur i dag – justeret lidt tidligere.",
     reasonTired:"Nora virker træt – sengetid justeret 20 min. tidligere.",
     reasonFresh:"Nora virker frisk – sengetid justeret 20 min. senere.",
-    checkinLabel:"Hvordan er Nora lige nu?",
-    checkinTired:"😴 Træt",checkinOkay:"😐 Okay",checkinFresh:"😄 Frisk",
-    reasonCorrect:(bed)=>`Foreslået sengetid ${bed} hjælper med at komme tilbage til rytmen.`,
+    reasonMissed:(mins)=>`Nora gik ${mins} min. for sent i seng i går – vi justerer gradvist.`,
   },
   en:{
     hdrTitle:"Nora's Sleep",ageUnit:"months",
@@ -265,73 +397,130 @@ const T={
     lBedtime:"Bedtime (when she fell asleep)",lWaketime:"Wake-up time",
     wakingsTitle:"NIGHT WAKINGS",btnAddWaking:"+ Add Long Waking",btnSaveNight:"Save Night Sleep",
     lShortWakings:"Brief wakings (<10 min):",
-    logNapTitle:"☀️ Log Nap",lNapDate:"Date",
+    logNapTitle:"☀️ Log Nap (manual)",lNapDate:"Date",
     btnAddNap:"+ Add Another Nap",btnSaveNaps:"Save Naps",
     napInfoNote:"Naps are added to any existing naps for the selected date.",
-    historyTitle:"📋 Sleep History",
-    settingsTitle:"⚙️ Settings",lAgeMo:"Nora's age (months)",
+    weekTitle:"📊 Weekly Summary",historyTitle:"📋 Sleep History",
+    settingsTitle:"⚙️ Nora",lBirthday:"Nora's birthday",
     lWakeGoal:"Weekday wake-up goal",lWinddown:"Wind-down duration (minutes)",
     lLastNapCutoff:"Latest nap end time",
-    tabToday:"Today",tabLog:"Log Sleep",tabHistory:"History",
+    daycareTitle:"🏫 Daycare",daycareDaysLabel:"Daycare days",
+    btnSaveSettings:"Save Settings",dataTitle:"🗑️ Data",btnClearData:"Clear All Sleep Data",
+    tabToday:"Today",tabTrack:"Tracker",tabLog:"Log",tabWeek:"Week",tabHistory:"History",
     weekendBadge:"🛌 Weekend – no set wake time",
+    daycareBadge:"🏫 Daycare",
     tagGood:"Good",tagFair:"Fair",tagPoor:"Too little",tagOnTrack:"On track",tagShort:"A bit short",tagVeryShort:"Very short",
     noNaps:"No naps logged today yet",noNight:"No night sleep logged yet",
-    noHistory:"No sleep data yet.\nTap 'Log Sleep' to get started.",
+    noHistory:"No sleep data yet.",noWeekData:"No data for this week yet.",
     saved:"Saved! ✓",napsSaved:"Naps saved! ✓",settingsSaved:"Settings saved! ✓",cleared:"Data cleared",
     fillFields:"Please fill in all fields",selectDate:"Please select a date",addNap:"Please add at least one nap",
     confirmClear:"Clear all sleep data? This cannot be undone.",
     napTotal:"Total nap time",nightSleep:"Night sleep (effective)",awakeOvernight:"Awake overnight",
     shortWakingsNote:(n)=>`Brief wakings: ${n}`,
     goal:"Goal",night:"Night",naps:"Naps",total:"Total",awake:"Awake",deleteNap:"Delete nap",
-    reasonWakeWindow:(end,bed)=>`Nora's last nap ended at ${end} – with a 4.5hr wake window, bedtime is suggested at ${bed}.`,
-    reasonSoftFloor:"Bedtime adjusted to earliest 19:30 – earlier than usual, watch for tired signs.",
+    trackTitle:"🌙 Start Sleep",lSleepStart:"When did she fall asleep?",
+    startSleepLabel:"Sleeping now",timerLabel:"Sleeping since",
+    lSleepEnd:"When did she wake up?",endSleepTitle:"☀️ End Sleep",
+    confirmWakeLabel:"Confirm wake-up",btnCancelWake:"Cancel",
+    wakeUpLabel:"Awake",briefWakeLabel:"Brief waking",
+    briefWakesTitle:"💤 Brief wakings tonight",
+    briefWakeLogged:"Brief waking logged",
+    sickLabel:"Nora is sick today",sickToggleBtn:"Remove",sickBtnLabel:"Nora is sick",
+    checkinLabel:"How is Nora?",
+    checkinTired:"😴 Tired",checkinOkay:"😐 Okay",checkinFresh:"😄 Fresh",
+    moodTitle:"😊 Nora's mood today",
+    weekAvgNight:"Avg night",weekAvgNap:"Avg nap",weekAvgTotal:"Avg total",
+    sickDay:"🤒 Sick",
+    reasonWakeWindow:(end,bed)=>`Nora's last nap ended at ${end} – with a 4.5hr wake window, bedtime suggested at ${bed}.`,
+    reasonSoftFloor:"Bedtime adjusted to earliest 19:30 – watch for tired signs.",
     reasonBase:(bed,wake)=>`Bedtime at ${bed} gives Nora enough time to sleep through to the ${wake} wake-up goal.`,
     reasonWeekend:"Weekend: no fixed wake time – Nora can sleep until she wakes naturally.",
     reasonBadNight:"Nora's total sleep yesterday (night + naps) was below the recommended amount.",
     reasonShortNap:"Today's naps were shorter than recommended.",
-    reasonBothBad:"Low total sleep yesterday and short nap today – an earlier bedtime is recommended.",
-    reasonOneNap:"Only one nap today – adjusted slightly earlier, but not too early.",
+    reasonBothBad:"Low total sleep yesterday and short nap today – earlier bedtime recommended.",
+    reasonOneNap:"Only one nap today – adjusted slightly earlier.",
     reasonTired:"Nora seems tired – bedtime adjusted 20 min. earlier.",
     reasonFresh:"Nora seems fresh – bedtime adjusted 20 min. later.",
-    checkinLabel:"How is Nora right now?",
-    checkinTired:"😴 Tired",checkinOkay:"😐 Okay",checkinFresh:"😄 Fresh",
-    reasonCorrect:(bed)=>`Suggested bedtime ${bed} helps return to the recommended rhythm.`,
+    reasonMissed:(mins)=>`Nora went to bed ${mins} min. late last night – gently adjusting back.`,
   }
 };
 
 let lang='da';
-function t(key,...args){
-  const v=T[lang] && T[lang][key];
-  if(v===undefined) return key;
-  return typeof v==='function'?v(...args):v;
-}
+function t(key,...args){const v=T[lang]&&T[lang][key];if(v===undefined)return key;return typeof v==='function'?v(...args):v;}
 function setLang(l){lang=l;document.getElementById('btnDA').classList.toggle('active',l==='da');document.getElementById('btnEN').classList.toggle('active',l==='en');applyTranslations();renderAll();}
+
 function applyTranslations(){
   const ids=['hdrTitle','sugTitle','todayNapTitle','lastNightTitle','logNightTitle','lNightDate','lBedtime','lWaketime',
-   'wakingsTitle','btnAddWaking','btnSaveNight','lShortWakings','logNapTitle','lNapDate','btnAddNap','btnSaveNaps',
-   'napInfoNote','historyTitle','settingsTitle','lAgeMo','lWakeGoal','lWinddown','lLastNapCutoff','btnSaveSettings','dataTitle','btnClearData'];
+    'wakingsTitle','btnAddWaking','btnSaveNight','lShortWakings','logNapTitle','lNapDate','btnAddNap','btnSaveNaps',
+    'napInfoNote','weekTitle','historyTitle','settingsTitle','lBirthday','lWakeGoal','lWinddown','lLastNapCutoff',
+    'daycareTitle','daycareDaysLabel','btnSaveSettings','dataTitle','btnClearData',
+    'trackTitle','lSleepStart','lSleepEnd','endSleepTitle','briefWakesTitle',
+    'sickLabel','sickBtnLabel','checkinTitle','moodTitle'];
   ids.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t(id);});
   document.getElementById('tab-today').textContent=t('tabToday');
+  document.getElementById('tab-track').textContent=t('tabTrack');
   document.getElementById('tab-log').textContent=t('tabLog');
+  document.getElementById('tab-week').textContent=t('tabWeek');
   document.getElementById('tab-history').textContent=t('tabHistory');
-  document.getElementById('ageDisplay').textContent=(state.settings.ageMonths||14)+' '+t('ageUnit');
+  document.getElementById('startSleepLabel').textContent=t('startSleepLabel');
+  document.getElementById('timerLabel').textContent=t('timerLabel');
+  document.getElementById('wakeUpLabel').textContent=t('wakeUpLabel');
+  document.getElementById('briefWakeLabel').textContent=t('briefWakeLabel');
+  document.getElementById('confirmWakeLabel').textContent=t('confirmWakeLabel');
+  document.getElementById('btnCancelWake').textContent=t('btnCancelWake');
+  document.getElementById('sickToggleBtn').textContent=t('sickToggleBtn');
+  document.getElementById('cbTired').textContent=t('checkinTired');
+  document.getElementById('cbOkay').textContent=t('checkinOkay');
+  document.getElementById('cbFresh').textContent=t('checkinFresh');
+  renderDaycareBtns();
+  updateAgeDisplay();
 }
 
 // ── State ──────────────────────────────────────────────────────
-let state={settings:{ageMonths:14,wakeGoal:'07:00',winddownMins:30},entries:[]};
+let state={
+  settings:{birthday:'2024-01-01',wakeGoal:'07:00',winddownMins:30,lastNapCutoff:'17:00',daycareDays:[1,2,3,4]},
+  entries:[],
+  eveningCheckin:null,
+  liveSession:null,
+  mood:{},
+  sickDays:[]
+};
 
 async function loadState(){
   setSyncStatus('connecting');
   const data=await fbGet();
-  if(data){state=data;if(!state.entries)state.entries=[];if(!state.settings)state.settings={ageMonths:14,wakeGoal:'07:00',winddownMins:30};}
+  if(data){
+    state=data;
+    if(!state.entries)state.entries=[];
+    if(!state.settings)state.settings={birthday:'2024-01-01',wakeGoal:'07:00',winddownMins:30,lastNapCutoff:'17:00',daycareDays:[1,2,3,4]};
+    if(!state.settings.daycareDays)state.settings.daycareDays=[1,2,3,4];
+    if(!state.settings.birthday)state.settings.birthday='2024-01-01';
+    if(!state.mood)state.mood={};
+    if(!state.sickDays)state.sickDays=[];
+  }
   setSyncStatus('');
   applySettings();applyTranslations();renderAll();
+  if(state.liveSession)startTimer();
 }
-
 async function saveState(){
   setSyncStatus('syncing');
   const ok=await fbSet(state);
   setSyncStatus(ok?'synced':'error');
+}
+
+// ── Age calculation ────────────────────────────────────────────
+function calcAgeMonths(){
+  if(!state.settings.birthday)return 14;
+  const bd=new Date(state.settings.birthday+'T12:00:00');
+  const now=new Date();
+  let months=(now.getFullYear()-bd.getFullYear())*12+(now.getMonth()-bd.getMonth());
+  if(now.getDate()<bd.getDate())months--;
+  return Math.max(0,months);
+}
+function updateAgeDisplay(){
+  const mo=calcAgeMonths();
+  document.getElementById('ageDisplay').textContent='Nora · '+mo+' '+t('ageUnit');
+  document.getElementById('versionDisplay').textContent=APP_VERSION;
 }
 
 // ── Navigation ─────────────────────────────────────────────────
@@ -339,23 +528,42 @@ function showPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
-  ['today','log','history'].forEach((n,i)=>{if(n===p)document.querySelectorAll('.tab')[i].classList.add('active');});
+  ['today','track','log','week','history'].forEach((n,i)=>{if(n===p)document.querySelectorAll('.tab')[i].classList.add('active');});
   if(p==='today')renderToday();
+  if(p==='week')renderWeek();
   if(p==='history')renderHistory();
+  if(p==='track')renderTracker();
 }
 
 // ── Settings ───────────────────────────────────────────────────
 function applySettings(){
   const s=state.settings;
-  document.getElementById('ageMonths').value=s.ageMonths;
+  document.getElementById('birthday').value=s.birthday||'';
   document.getElementById('wakeGoal').value=s.wakeGoal;
   document.getElementById('winddownMins').value=s.winddownMins;
   document.getElementById('lastNapCutoff').value=s.lastNapCutoff||'17:00';
-  document.getElementById('ageDisplay').textContent=s.ageMonths+' '+t('ageUnit');
-  document.getElementById('versionDisplay').textContent=APP_VERSION;
+  renderDaycareBtns();
+  updateAgeDisplay();
+}
+function renderDaycareBtns(){
+  const wrap=document.getElementById('daycareDaysBtns');
+  if(!wrap)return;
+  const days=lang==='da'?['Man','Tir','Ons','Tor','Fre']:['Mon','Tue','Wed','Thu','Fri'];
+  wrap.innerHTML=days.map((d,i)=>{
+    const dayNum=i+1;
+    const active=(state.settings.daycareDays||[]).includes(dayNum);
+    return`<button class="day-btn${active?' active':''}" onclick="toggleDaycareDay(${dayNum})">${d}</button>`;
+  }).join('');
+}
+function toggleDaycareDay(d){
+  const dd=state.settings.daycareDays||[];
+  const idx=dd.indexOf(d);
+  if(idx>=0)dd.splice(idx,1);else dd.push(d);
+  state.settings.daycareDays=dd;
+  renderDaycareBtns();
 }
 function saveSettings(){
-  state.settings.ageMonths=parseInt(document.getElementById('ageMonths').value)||14;
+  state.settings.birthday=document.getElementById('birthday').value;
   state.settings.wakeGoal=document.getElementById('wakeGoal').value;
   state.settings.winddownMins=parseInt(document.getElementById('winddownMins').value)||30;
   state.settings.lastNapCutoff=document.getElementById('lastNapCutoff').value||'17:00';
@@ -368,9 +576,12 @@ function timeToMins(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function minsToTime(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
 function fmtDur(mins){const h=Math.floor(mins/60),m=mins%60;return m>0?`${h}t ${m}m`:`${h}t`;}
 function todayStr(){return new Date().toISOString().slice(0,10);}
+function nowTimeStr(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
 function isWeekend(d){const w=new Date(d+'T12:00:00').getDay();return w===0||w===6;}
 function isFriday(d){return new Date(d+'T12:00:00').getDay()===5;}
-function isRelaxed(d){return isWeekend(d)||isFriday(d);}
+function isDaycareDay(d){const w=new Date(d+'T12:00:00').getDay();return(state.settings.daycareDays||[]).includes(w);}
+function isRelaxed(d){return isWeekend(d)||isFriday(d)||!isDaycareDay(d);}
+function isSick(d){return(state.sickDays||[]).includes(d);}
 function fmtDateLabel(d){return new Date(d+'T12:00:00').toLocaleDateString(lang==='da'?'da-DK':'en-GB',{weekday:'short',day:'2-digit',month:'short'});}
 
 function nightDuration(e){
@@ -387,17 +598,56 @@ function napDuration(e){
 }
 function prevDayTotalSleep(nightEntry){
   if(!nightEntry)return null;
-  const nightMins=nightDuration(nightEntry);
-  const prevNapMins=state.entries.filter(e=>e.date===nightEntry.date&&e.type==='nap').reduce((s,e)=>s+napDuration(e),0);
-  return nightMins+prevNapMins;
+  const nm=nightDuration(nightEntry);
+  const prev=state.entries.filter(e=>e.date===nightEntry.date&&e.type==='nap').reduce((s,e)=>s+napDuration(e),0);
+  return nm+prev;
+}
+
+// ── Sick day ───────────────────────────────────────────────────
+function toggleSick(){
+  const today=todayStr();
+  if(!state.sickDays)state.sickDays=[];
+  const idx=state.sickDays.indexOf(today);
+  if(idx>=0)state.sickDays.splice(idx,1);
+  else state.sickDays.push(today);
+  saveState();renderToday();
+}
+
+// ── Mood ───────────────────────────────────────────────────────
+const MOODS=['great','good','okay','tired','cranky'];
+const MOOD_EMOJI={great:'😄',good:'🙂',okay:'😐',tired:'😴',cranky:'😤'};
+function setMood(m){
+  const today=todayStr();
+  if(!state.mood)state.mood={};
+  state.mood[today]=state.mood[today]===m?null:m;
+  saveState();renderMoodBtns();
+}
+function renderMoodBtns(){
+  const today=todayStr();
+  const cur=state.mood&&state.mood[today];
+  MOODS.forEach((m,i)=>{
+    const el=document.getElementById('mb'+(i+1));
+    if(el){el.textContent=MOOD_EMOJI[m];el.className='mood-btn'+(cur===m?' active':'');}
+  });
+}
+
+// ── Daily fact ─────────────────────────────────────────────────
+function renderFact(){
+  const idx=Math.floor((Date.now()/(1000*60*60*24)))%FACTS.length;
+  const f=FACTS[idx];
+  document.getElementById('factEmoji').textContent=f.e;
+  document.getElementById('factText').textContent=lang==='da'?f.da:f.en;
+  document.getElementById('factBox').style.display='block';
 }
 
 // ── Suggestion Engine ──────────────────────────────────────────
 function computeSuggestions(){
   const s=state.settings;
-  const rec=recSleep(s.ageMonths);
+  const mo=calcAgeMonths();
+  const rec=recSleep(mo);
   const today=todayStr();
   const todayRelaxed=isRelaxed(today);
+  const todayDaycare=isDaycareDay(today);
 
   const todayNapEntries=state.entries.filter(e=>e.date===today&&e.type==='nap');
   const todayNapMins=todayNapEntries.reduce((sum,e)=>sum+napDuration(e),0);
@@ -413,80 +663,72 @@ function computeSuggestions(){
   const onlyOneNap=todayNapCount===1;
 
   const wakeGoalMins=timeToMins(s.wakeGoal);
-  let idealBedMins=wakeGoalMins-(rec.nightMin*60);
+  let lastNapEndMins=null;
+  todayNapEntries.forEach(e=>{(e.naps||[]).forEach(n=>{let en=timeToMins(n.end);if(lastNapEndMins===null||en>lastNapEndMins)lastNapEndMins=en;});});
+
+  let idealBedMins;
+  if(lastNapEndMins!==null){idealBedMins=lastNapEndMins+270;}
+  else{idealBedMins=wakeGoalMins-(rec.nightMin*60);}
+
+  let nudge=0;
+  if(hadBadNight)nudge-=10;
+  if(onlyOneNap)nudge-=10;
+  else if(hadShortNap)nudge-=10;
+  idealBedMins+=nudge;
 
   let correctionMins=0;
   if(lastNight){
-    const lateness=timeToMins(lastNight.bedtime)-(wakeGoalMins-rec.nightMin*60);
-    if(lateness>15)correctionMins=Math.min(20,Math.round(lateness*0.4));
+    const baseBed=wakeGoalMins-rec.nightMin*60;
+    const lateness=timeToMins(lastNight.bedtime)-baseBed;
+    if(lateness>15)correctionMins=Math.min(15,Math.round(lateness*0.3));
   }
   idealBedMins-=correctionMins;
 
-  let earlyAdjust=0;
-  if(hadBadNight&&hadShortNap)earlyAdjust=30;
-  else if(hadBadNight)earlyAdjust=15;
-  else if(hadShortNap)earlyAdjust=20;
+  const checkin=state.eveningCheckin&&state.eveningCheckin.date===today?state.eveningCheckin.mood:null;
+  if(checkin==='tired')idealBedMins-=20;
+  else if(checkin==='fresh')idealBedMins+=20;
 
-  let oneNapAdjust=0;
-  if(onlyOneNap&&earlyAdjust<30){oneNapAdjust=Math.min(30,30-earlyAdjust);earlyAdjust=30;}
-  idealBedMins-=earlyAdjust;
-
-  // Wake window: don't suggest bedtime too soon after last nap
-  const minWakeWindowMins = 240; // 4 hours minimum awake time after last nap
-  const todayNapEntries2 = state.entries.filter(e=>e.date===today&&e.type==='nap');
-  let lastNapEndMins = null;
-  todayNapEntries2.forEach(e=>{
-    (e.naps||[]).forEach(n=>{
-      let en=timeToMins(n.end);
-      if(lastNapEndMins===null||en>lastNapEndMins) lastNapEndMins=en;
-    });
-  });
-  if(lastNapEndMins!==null){
-    const earliestBed = lastNapEndMins + minWakeWindowMins;
-    if(idealBedMins < earliestBed) idealBedMins = earliestBed;
-  }
-
-  // Evening check-in adjustment
-  const checkin = state.eveningCheckin && state.eveningCheckin.date === today ? state.eveningCheckin.mood : null;
-  let checkinAdjust = 0;
-  if(checkin === 'tired') checkinAdjust = -20;
-  else if(checkin === 'fresh') checkinAdjust = 20;
-  idealBedMins += checkinAdjust;
-
-  // Hard floor and ceiling on bedtime suggestion
-  const bedFloor = 20 * 60; // 20:00
-  const bedCeiling = 22 * 60; // 22:00
-  if(idealBedMins < bedFloor) idealBedMins = bedFloor;
-  if(idealBedMins > bedCeiling) idealBedMins = bedCeiling;
+  const softFloor=19*60+30,hardCeiling=22*60;
+  const hitSoftFloor=idealBedMins<softFloor;
+  if(idealBedMins<softFloor)idealBedMins=softFloor;
+  if(idealBedMins>hardCeiling)idealBedMins=hardCeiling;
 
   const winddownMins=idealBedMins-s.winddownMins;
-
   const reasons=[];
-  reasons.push(t('reasonBase',minsToTime(idealBedMins),s.wakeGoal));
+  if(lastNapEndMins!==null)reasons.push(t('reasonWakeWindow',minsToTime(lastNapEndMins),minsToTime(idealBedMins)));
+  else reasons.push(t('reasonBase',minsToTime(idealBedMins),s.wakeGoal));
   if(todayRelaxed)reasons.push(t('reasonWeekend'));
-  if(hadBadNight&&hadShortNap)reasons.push(t('reasonBothBad'));
+  if(hadBadNight&&onlyOneNap)reasons.push(t('reasonBothBad'));
   else if(hadBadNight)reasons.push(t('reasonBadNight'));
   else if(hadShortNap)reasons.push(t('reasonShortNap'));
-  if(oneNapAdjust>0)reasons.push(t('reasonOneNap'));
-  if(correctionMins>0){reasons.push(t('reasonMissed',Math.round(correctionMins/0.4)));reasons.push(t('reasonCorrect',minsToTime(idealBedMins)));}
-
+  if(onlyOneNap&&!hadBadNight)reasons.push(t('reasonOneNap'));
+  if(hitSoftFloor)reasons.push(t('reasonSoftFloor'));
+  if(correctionMins>0)reasons.push(t('reasonMissed',Math.round(correctionMins/0.3)));
   if(checkin==='tired')reasons.push(t('reasonTired'));
   else if(checkin==='fresh')reasons.push(t('reasonFresh'));
 
   return{bedtime:minsToTime(idealBedMins),winddown:minsToTime(winddownMins),
     todayNapMins,lastNightMins,lastNightWakings,checkin,
-    hadBadNight,hadShortNap,onlyOneNap,correctionMins,earlyAdjust,
-    todayRelaxed,reasons,rec};
+    hadBadNight,hadShortNap,onlyOneNap,nudge,correctionMins,
+    todayRelaxed,todayDaycare,reasons,rec};
 }
 
 // ── Render Today ───────────────────────────────────────────────
 function renderToday(){
   const sug=computeSuggestions();
+  const today=todayStr();
+  const sick=isSick(today);
+
+  // Sick banner
+  document.getElementById('sickBanner').style.display=sick?'flex':'none';
+  document.getElementById('sickBtn').style.display=sick?'none':'inline-block';
+
   let sugHTML='';
   if(sug.todayRelaxed)sugHTML+=`<div class="weekend-badge">${t('weekendBadge')}</div><br>`;
+  if(sug.todayDaycare&&!sug.todayRelaxed)sugHTML+=`<div class="weekend-badge" style="background:#1a1e2e;border-color:#2a3050;color:var(--accent2)">${t('daycareBadge')}</div><br>`;
   sugHTML+=`
     <div class="sug-row"><span class="sug-label">${t('winddownLabel')}</span><span class="sug-val">${sug.winddown}</span></div>
-    <div class="sug-row"><span class="sug-label">${t('bedtimeLabel')}</span><span class="sug-val ${(sug.hadBadNight||sug.earlyAdjust>0)?'warn':''}">${sug.bedtime}</span></div>
+    <div class="sug-row"><span class="sug-label">${t('bedtimeLabel')}</span><span class="sug-val ${(sug.hadBadNight||sug.nudge<0)?'warn':''}">${sug.bedtime}</span></div>
     <div class="sug-row"><span class="sug-label">${t('wakeGoalLabel')}</span><span class="sug-val">${state.settings.wakeGoal}</span></div>`;
   document.getElementById('suggestionsContent').innerHTML=sugHTML;
 
@@ -494,14 +736,18 @@ function renderToday(){
   if(sug.reasons.length){rb.style.display='block';rb.innerHTML=sug.reasons.map(r=>`<div class="reason-item">💬 ${r}</div>`).join('');}
   else rb.style.display='none';
 
-  // Only show check-in within 2 hours before wind-down
+  // Evening check-in (2hrs before winddown)
   const nowMins=new Date().getHours()*60+new Date().getMinutes();
   const winddownMinsVal=timeToMins(sug.winddown);
-  const checkinVisible=nowMins>=winddownMinsVal-120;
-  const checkinCard=document.getElementById('checkinCard');
-  if(checkinCard)checkinCard.style.display=checkinVisible?'block':'none';
+  document.getElementById('checkinCard').style.display=nowMins>=winddownMinsVal-120?'block':'none';
   renderCheckin(sug.checkin);
 
+  // Mood (12:00–18:00)
+  const showMood=nowMins>=720&&nowMins<=1080;
+  document.getElementById('moodCard').style.display=showMood?'block':'none';
+  renderMoodBtns();
+
+  // Today naps
   const nm=sug.todayNapMins,nt=sug.rec.napMin*60;
   const np=Math.min(100,Math.round(nm/nt*100));
   const nc=np>=80?'':np>=50?'warn':'bad';
@@ -513,6 +759,7 @@ function renderToday(){
     <div class="bar-labels"><span>0</span><span>${t('goal')}: ${fmtDur(nt)}</span></div></div>`
     :`<div class="empty">${t('noNaps')}</div>`;
 
+  // Last night
   const ln=sug.lastNightMins;
   if(ln!==null){
     const nt2=sug.rec.nightMin*60,p=Math.min(100,Math.round(ln/nt2*100));
@@ -521,16 +768,166 @@ function renderToday(){
     const lastNight=state.entries.filter(e=>e.type==='night').sort((a,b)=>b.date.localeCompare(a.date))[0];
     const longWakings=lastNight?(lastNight.wakings||[]).reduce((s,w)=>s+(w.duration||0),0):0;
     const shortWakings=lastNight?(lastNight.shortWakings||0):0;
-    let wakingNote='';
-    if(longWakings>0)wakingNote+=`<div style="font-size:.82rem;color:var(--warn);margin-top:.4rem">😴 ${t('awakeOvernight')}: ${fmtDur(longWakings)}</div>`;
-    if(shortWakings>0)wakingNote+=`<div style="font-size:.82rem;color:var(--muted);margin-top:.25rem">💤 ${t('shortWakingsNote',shortWakings)}</div>`;
+    let wn='';
+    if(longWakings>0)wn+=`<div style="font-size:.82rem;color:var(--warn);margin-top:.4rem">😴 ${t('awakeOvernight')}: ${fmtDur(longWakings)}</div>`;
+    if(shortWakings>0)wn+=`<div style="font-size:.82rem;color:var(--muted);margin-top:.25rem">💤 ${t('shortWakingsNote',shortWakings)}</div>`;
     document.getElementById('lastNightSummary').innerHTML=`
       <div style="font-size:.85rem;color:var(--muted);margin-bottom:.3rem">${t('nightSleep')}</div>
-      <div style="font-size:1.4rem;font-weight:700;color:var(--accent2)">${fmtDur(ln)} ${tag}</div>
-      ${wakingNote}
+      <div style="font-size:1.4rem;font-weight:700;color:var(--accent2)">${fmtDur(ln)} ${tag}</div>${wn}
       <div class="sleep-bar-wrap"><div class="sleep-bar-bg"><div class="sleep-bar ${col}" style="width:${p}%"></div></div>
       <div class="bar-labels"><span>0</span><span>${t('goal')}: ${fmtDur(nt2)}</span></div></div>`;
   } else document.getElementById('lastNightSummary').innerHTML=`<div class="empty">${t('noNight')}</div>`;
+
+  renderFact();
+}
+
+// ── Check-in ───────────────────────────────────────────────────
+function setCheckin(mood){
+  const cur=state.eveningCheckin&&state.eveningCheckin.date===todayStr()?state.eveningCheckin.mood:null;
+  state.eveningCheckin={date:todayStr(),mood:cur===mood?null:mood};
+  saveState();renderToday();
+}
+function renderCheckin(checkin){
+  ['tired','okay','fresh'].forEach(m=>{
+    const el=document.getElementById('cb'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(el)el.className='checkin-btn'+(checkin===m?' active-'+m:'');
+  });
+}
+
+// ── Live Tracker ───────────────────────────────────────────────
+let timerInterval=null;
+function renderTracker(){
+  const live=state.liveSession;
+  document.getElementById('liveSessionBox').style.display=live?'block':'none';
+  document.getElementById('startSleepBox').style.display=live?'none':'block';
+  document.getElementById('endSleepBox').style.display='none';
+  if(live){
+    const isNight=live.isNight;
+    document.getElementById('briefWakesCard').style.display=isNight?'block':'none';
+    renderBriefWakes();
+  }
+}
+function startSleep(){
+  const date=document.getElementById('trackStartDate').value;
+  const time=document.getElementById('trackStartTime').value;
+  if(!date||!time){showToast(t('fillFields'));return;}
+  const startMins=timeToMins(time);
+  const isNight=startMins>=19*60||startMins<6*60;
+  state.liveSession={date,startTime:time,startTs:Date.now(),isNight,briefWakes:[]};
+  saveState();startTimer();renderTracker();
+}
+function startTimer(){
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    if(!state.liveSession)return;
+    const elapsed=Math.floor((Date.now()-state.liveSession.startTs)/1000);
+    const h=Math.floor(elapsed/3600),m=Math.floor((elapsed%3600)/60),s=elapsed%60;
+    const el=document.getElementById('timerDisplay');
+    if(el)el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const sl=document.getElementById('sleepingSince');
+    if(sl)sl.textContent=state.liveSession.date+' '+state.liveSession.startTime;
+  },1000);
+}
+function logBriefWake(){
+  if(!state.liveSession)return;
+  if(!state.liveSession.briefWakes)state.liveSession.briefWakes=[];
+  state.liveSession.briefWakes.push(nowTimeStr());
+  saveState();renderBriefWakes();showToast(t('briefWakeLogged'));
+}
+function renderBriefWakes(){
+  const el=document.getElementById('briefWakesList');
+  if(!el||!state.liveSession)return;
+  const bw=state.liveSession.briefWakes||[];
+  el.innerHTML=bw.length?bw.map(w=>`<div style="font-size:.82rem;color:var(--muted);padding:.2rem 0">💤 ${w}</div>`).join(''):`<div style="font-size:.82rem;color:var(--muted)">${lang==='da'?'Ingen endnu':'None yet'}</div>`;
+}
+function showEndSleep(){
+  document.getElementById('endSleepBox').style.display='block';
+  document.getElementById('trackEndDate').value=todayStr();
+  document.getElementById('trackEndTime').value=nowTimeStr();
+}
+function cancelEndSleep(){document.getElementById('endSleepBox').style.display='none';}
+function confirmEndSleep(){
+  const endDate=document.getElementById('trackEndDate').value;
+  const endTime=document.getElementById('trackEndTime').value;
+  if(!endDate||!endTime){showToast(t('fillFields'));return;}
+  const live=state.liveSession;
+  if(!live)return;
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  const bwCount=live.briefWakes?live.briefWakes.length:0;
+  if(live.isNight){
+    state.entries=state.entries.filter(e=>!(e.date===live.date&&e.type==='night'));
+    state.entries.push({type:'night',date:live.date,bedtime:live.startTime,waketime:endTime,wakings:[],shortWakings:bwCount});
+  } else {
+    let existing=state.entries.find(e=>e.date===live.date&&e.type==='nap');
+    if(existing)existing.naps=[...(existing.naps||[]),{start:live.startTime,end:endTime}];
+    else state.entries.push({type:'nap',date:live.date,naps:[{start:live.startTime,end:endTime}]});
+  }
+  state.liveSession=null;
+  saveState();renderTracker();renderAll();showToast(t('saved'));
+}
+
+// ── Render Week ────────────────────────────────────────────────
+function renderWeek(){
+  const el=document.getElementById('weekContent');
+  const today=new Date();
+  const dow=today.getDay();
+  const monday=new Date(today);
+  monday.setDate(today.getDate()-(dow===0?6:dow-1));
+  const dates=[];
+  for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);dates.push(d.toISOString().slice(0,10));}
+
+  const rec=recSleep(calcAgeMonths());
+  const maxMins=rec.max*60;
+  let totalNight=0,totalNap=0,nightCount=0,napCount=0;
+
+  const rows=dates.map(date=>{
+    const nights=state.entries.filter(e=>e.date===date&&e.type==='night');
+    const naps=state.entries.filter(e=>e.date===date&&e.type==='nap');
+    const nightMins=nights.reduce((s,e)=>s+nightDuration(e),0);
+    const napMins=naps.reduce((s,e)=>s+napDuration(e),0);
+    const wakings=nights.reduce((s,e)=>s+(e.wakings||[]).reduce((ss,w)=>ss+(w.duration||0),0)+(e.shortWakings||0),0);
+    const mood=state.mood&&state.mood[date]?MOOD_EMOJI[state.mood[date]]:'';
+    const sick=isSick(date);
+    if(nightMins>0){totalNight+=nightMins;nightCount++;}
+    if(napMins>0){totalNap+=napMins;napCount++;}
+    const d=new Date(date+'T12:00:00');
+    const dayLabel=(lang==='da'?DAYS_SHORT_DA:DAYS_SHORT_EN)[d.getDay()];
+    const nightPct=Math.round(nightMins/maxMins*100);
+    const napPct=Math.round(napMins/maxMins*100);
+    const hasData=nightMins>0||napMins>0;
+    return`<div class="chart-row">
+      <div class="chart-day">${dayLabel}</div>
+      <div class="chart-bars">
+        <div class="chart-bar-wrap">
+          <div class="chart-bar-night" style="width:${nightPct}%"></div>
+          <div class="chart-bar-nap" style="width:${napPct}%"></div>
+        </div>
+      </div>
+      <div class="chart-val">${hasData?fmtDur(nightMins+napMins):''}</div>
+      <div class="chart-mood">${sick?'🤒':mood}</div>
+      <div class="chart-wakes">${wakings>0?wakings+'x':''}</div>
+    </div>`;
+  }).join('');
+
+  const avgNight=nightCount>0?Math.round(totalNight/nightCount):0;
+  const avgNap=napCount>0?Math.round(totalNap/napCount):0;
+
+  el.innerHTML=`
+    <div class="card">
+      <div style="display:flex;gap:1rem;font-size:.72rem;color:var(--muted);margin-bottom:.75rem">
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent);margin-right:4px"></span>${lang==='da'?'Nat':'Night'}</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent2);margin-right:4px"></span>${lang==='da'?'Lur':'Nap'}</span>
+      </div>
+      <div class="chart-wrap">${rows}</div>
+    </div>
+    <div class="card">
+      <h2>${lang==='da'?'Ugensgennemsnit':'Weekly averages'}</h2>
+      <div class="week-stat-grid">
+        <div class="week-stat"><div class="week-stat-val">${avgNight>0?fmtDur(avgNight):'—'}</div><div class="week-stat-label">${t('weekAvgNight')}</div></div>
+        <div class="week-stat"><div class="week-stat-val">${avgNap>0?fmtDur(avgNap):'—'}</div><div class="week-stat-label">${t('weekAvgNap')}</div></div>
+        <div class="week-stat"><div class="week-stat-val">${avgNight+avgNap>0?fmtDur(avgNight+avgNap):'—'}</div><div class="week-stat-label">${t('weekAvgTotal')}</div></div>
+      </div>
+    </div>`;
 }
 
 // ── Render History ─────────────────────────────────────────────
@@ -538,28 +935,30 @@ function renderHistory(){
   const el=document.getElementById('historyList');
   const allDates=[...new Set(state.entries.map(e=>e.date))].sort((a,b)=>b.localeCompare(a)).slice(0,60);
   if(!allDates.length){el.innerHTML=`<div class="empty">${t('noHistory')}</div>`;return;}
-  const rec=recSleep(state.settings.ageMonths);
+  const rec=recSleep(calcAgeMonths());
   el.innerHTML=allDates.map(date=>{
     const nights=state.entries.filter(e=>e.date===date&&e.type==='night');
     const naps=state.entries.filter(e=>e.date===date&&e.type==='nap');
     const nightMins=nights.reduce((s,e)=>s+nightDuration(e),0);
     const napMins=naps.reduce((s,e)=>s+napDuration(e),0);
-    const longWakings=nights.reduce((s,e)=>s+(e.wakings||[]).reduce((ss,w)=>ss+(w.duration||0),0),0);
-    const shortWakings=nights.reduce((s,e)=>s+(e.shortWakings||0),0);
+    const lw=nights.reduce((s,e)=>s+(e.wakings||[]).reduce((ss,w)=>ss+(w.duration||0),0),0);
+    const sw=nights.reduce((s,e)=>s+(e.shortWakings||0),0);
     const total=nightMins+napMins;
     const label=fmtDateLabel(date);
     const tt=total>=rec.min*60?'tag-good':total>=rec.min*60*0.85?'tag-warn':'tag-bad';
     const tl=total>=rec.min*60?t('tagOnTrack'):total>=rec.min*60*0.85?t('tagShort'):t('tagPoor');
     const relaxed=isRelaxed(date);
+    const sick=isSick(date);
+    const mood=state.mood&&state.mood[date]?MOOD_EMOJI[state.mood[date]]:'';
     const napPills=naps.flatMap((e,ei)=>(e.naps||[]).map((n,ni)=>`<span class="nap-pill">${n.start}–${n.end}<span class="del-nap" onclick="deleteNap('${date}',${ei},${ni})" title="${t('deleteNap')}">✕</span></span>`)).join('');
     return`<div class="history-item">
-      <div class="history-date">${label} <span class="tag ${tt}">${tl}</span>${relaxed?' <span class="tag tag-good">🛌</span>':''}</div>
+      <div class="history-date">${label} <span class="tag ${tt}">${tl}</span>${relaxed?' <span class="tag tag-good">🛌</span>':''}${sick?' <span class="tag tag-bad">🤒</span>':''}${mood?` <span style="font-size:.9rem">${mood}</span>`:''}</div>
       <div class="history-grid">
         <div class="history-stat">🌙 ${t('night')}: <span>${nightMins>0?fmtDur(nightMins):'—'}</span></div>
         <div class="history-stat">☀️ ${t('naps')}: <span>${napMins>0?fmtDur(napMins):'—'}</span></div>
         <div class="history-stat">📊 ${t('total')}: <span>${total>0?fmtDur(total):'—'}</span></div>
-        ${longWakings>0?`<div class="history-stat">😴 ${t('awake')}: <span style="color:var(--warn)">${fmtDur(longWakings)}</span></div>`:''}
-        ${shortWakings>0?`<div class="history-stat">💤 ${lang==='da'?'Korte':'Brief'}: <span style="color:var(--muted)">${shortWakings}x</span></div>`:''}
+        ${lw>0?`<div class="history-stat">😴 ${t('awake')}: <span style="color:var(--warn)">${fmtDur(lw)}</span></div>`:''}
+        ${sw>0?`<div class="history-stat">💤 ${lang==='da'?'Korte':'Brief'}: <span style="color:var(--muted)">${sw}x</span></div>`:''}
       </div>
       ${napPills?`<div class="history-naps">${napPills}</div>`:''}
     </div>`;
@@ -574,7 +973,7 @@ function deleteNap(date,ei,ni){
   saveState();renderAll();
 }
 
-// ── Wakings ────────────────────────────────────────────────────
+// ── Wakings / Naps UI ──────────────────────────────────────────
 let wakingCount=0;
 function addWaking(){
   wakingCount++;const id='waking_'+wakingCount;
@@ -587,8 +986,6 @@ function getWakings(){
     time:r.querySelector('.w-time').value,duration:parseInt(r.querySelector('.w-dur').value)||0
   })).filter(w=>w.time&&w.duration>0);
 }
-
-// ── Naps ───────────────────────────────────────────────────────
 let napCount=1;
 function addNap(){
   napCount++;const id='nap'+napCount;
@@ -604,12 +1001,10 @@ function saveNight(){
   const bed=document.getElementById('bedtime').value;
   const wake=document.getElementById('waketime').value;
   if(!date||!bed||!wake){showToast(t('fillFields'));return;}
-  const shortWakings=parseInt(document.getElementById('shortWakings').value)||0;
+  const sw=parseInt(document.getElementById('shortWakings').value)||0;
   state.entries=state.entries.filter(e=>!(e.date===date&&e.type==='night'));
-  state.entries.push({type:'night',date,bedtime:bed,waketime:wake,wakings:getWakings(),shortWakings});
-  saveState();
-  document.getElementById('wakingsList').innerHTML='';
-  document.getElementById('shortWakings').value='0';
+  state.entries.push({type:'night',date,bedtime:bed,waketime:wake,wakings:getWakings(),shortWakings:sw});
+  saveState();document.getElementById('wakingsList').innerHTML='';document.getElementById('shortWakings').value='0';
   showToast(t('saved'));renderAll();
 }
 
@@ -630,34 +1025,21 @@ function saveNaps(){
   showToast(t('napsSaved'));renderAll();
 }
 
-function setCheckin(mood){
-  const current=state.eveningCheckin&&state.eveningCheckin.date===todayStr()?state.eveningCheckin.mood:null;
-  // Toggle off if tapping the same option again
-  state.eveningCheckin={date:todayStr(),mood:current===mood?null:mood};
-  saveState();
-  renderToday();
+function clearData(){
+  if(confirm(t('confirmClear'))){
+    state.entries=[];state.mood={};state.sickDays=[];state.liveSession=null;state.eveningCheckin=null;
+    if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+    saveState();showToast(t('cleared'));renderAll();
+  }
 }
-function renderCheckin(checkin){
-  const card=document.getElementById('checkinCard');
-  if(!card)return;
-  ['tired','okay','fresh'].forEach(m=>{
-    const el=document.getElementById('cb'+m.charAt(0).toUpperCase()+m.slice(1));
-    if(el)el.className='checkin-btn'+(checkin===m?' active-'+m:'');
-  });
-  const title=document.getElementById('checkinTitle');
-  if(title)title.textContent=t('checkinLabel');
-  const btns={tired:document.getElementById('cbTired'),okay:document.getElementById('cbOkay'),fresh:document.getElementById('cbFresh')};
-  if(btns.tired)btns.tired.textContent=t('checkinTired');
-  if(btns.okay)btns.okay.textContent=t('checkinOkay');
-  if(btns.fresh)btns.fresh.textContent=t('checkinFresh');
-}
-function clearData(){if(confirm(t('confirmClear'))){state.entries=[];state.eveningCheckin=null;saveState();showToast(t('cleared'));renderAll();}}
-function renderAll(){renderToday();renderHistory();}
+function renderAll(){renderToday();renderWeek();renderHistory();}
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
 function initDates(){
   const y=new Date();y.setDate(y.getDate()-1);
   document.getElementById('nightDate').value=y.toISOString().slice(0,10);
   document.getElementById('napDate').value=todayStr();
+  document.getElementById('trackStartDate').value=todayStr();
+  document.getElementById('trackStartTime').value=nowTimeStr();
 }
 
 loadState();initDates();
