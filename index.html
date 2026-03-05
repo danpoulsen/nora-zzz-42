@@ -376,7 +376,7 @@ const T={
     moodTitle:"😊 Noras humør i dag",
     weekAvgNight:"Gns. nat",weekAvgNap:"Gns. lur",weekAvgTotal:"Gns. total",
     sickDay:"🤒 Syg",
-    reasonWakeWindow:(end,bed)=>`Noras sidste lur sluttede ${end} – med 4½ times vågevinde foreslås sengetid ${bed}.`,
+    reasonNoNaps:"Ingen lure er logget endnu i dag – sengetiden er et foreløbigt estimat.",
     reasonSoftFloor:"Sengetid er justeret til tidligst 19:30 – hold øje med træthedstegn.",
     reasonBase:(bed,wake)=>`Sengetid ${bed} giver Nora tid til at sove til opvågningsmålet ${wake}.`,
     reasonWeekend:"Weekend: ingen fast opvågning – Nora må sove til hun vågner naturligt.",
@@ -431,7 +431,7 @@ const T={
     moodTitle:"😊 Nora's mood today",
     weekAvgNight:"Avg night",weekAvgNap:"Avg nap",weekAvgTotal:"Avg total",
     sickDay:"🤒 Sick",
-    reasonWakeWindow:(end,bed)=>`Nora's last nap ended at ${end} – with a 4.5hr wake window, bedtime suggested at ${bed}.`,
+    reasonNoNaps:"No naps logged yet today – bedtime is a preliminary estimate.",
     reasonSoftFloor:"Bedtime adjusted to earliest 19:30 – watch for tired signs.",
     reasonBase:(bed,wake)=>`Bedtime at ${bed} gives Nora enough time to sleep through to the ${wake} wake-up goal.`,
     reasonWeekend:"Weekend: no fixed wake time – Nora can sleep until she wakes naturally.",
@@ -695,8 +695,8 @@ function computeSuggestions(){
 
   const winddownMins=idealBedMins-s.winddownMins;
   const reasons=[];
-  if(lastNapEndMins!==null)reasons.push(t('reasonWakeWindow',minsToTime(lastNapEndMins),minsToTime(idealBedMins)));
-  else reasons.push(t('reasonBase',minsToTime(idealBedMins),s.wakeGoal));
+  if(lastNapEndMins!==null){reasons.push(t('reasonWakeWindow',minsToTime(lastNapEndMins),minsToTime(idealBedMins)));}
+  else{reasons.push(t('reasonBase',minsToTime(idealBedMins),s.wakeGoal));reasons.push(t('reasonNoNaps'));}
   if(todayRelaxed)reasons.push(t('reasonWeekend'));
   if(hadBadNight&&onlyOneNap)reasons.push(t('reasonBothBad'));
   else if(hadBadNight)reasons.push(t('reasonBadNight'));
