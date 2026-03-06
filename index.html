@@ -376,7 +376,7 @@ const T={
     moodTitle:"😊 Noras humør i dag",
     weekAvgNight:"Gns. nat",weekAvgNap:"Gns. lur",weekAvgTotal:"Gns. total",
     sickDay:"🤒 Syg",
-    reasonNoNaps:"Ingen lure er logget endnu i dag – sengetiden er et foreløbigt estimat.",
+    reasonWakeWindow:(end,bed)=>`Noras sidste lur sluttede ${end} – med 4½ times vågevinde foreslås sengetid ${bed}.`,
     reasonSoftFloor:"Sengetid er justeret til tidligst 19:30 – hold øje med træthedstegn.",
     reasonBase:(bed,wake)=>`Sengetid ${bed} giver Nora tid til at sove til opvågningsmålet ${wake}.`,
     reasonWeekend:"Weekend: ingen fast opvågning – Nora må sove til hun vågner naturligt.",
@@ -455,8 +455,9 @@ function applyTranslations(){
     'napInfoNote','weekTitle','historyTitle','settingsTitle','lBirthday','lWakeGoal','lWinddown','lLastNapCutoff',
     'daycareTitle','daycareDaysLabel','btnSaveSettings','dataTitle','btnClearData',
     'trackTitle','lSleepStart','lSleepEnd','endSleepTitle','briefWakesTitle',
-    'sickLabel','sickBtnLabel','checkinTitle','moodTitle'];
+    'sickLabel','sickBtnLabel','moodTitle'];
   ids.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t(id);});
+  document.getElementById('checkinTitle').textContent=t('checkinLabel');
   document.getElementById('tab-today').textContent=t('tabToday');
   document.getElementById('tab-track').textContent=t('tabTrack');
   document.getElementById('tab-log').textContent=t('tabLog');
@@ -813,7 +814,10 @@ function startSleep(){
   if(!date||!time){showToast(t('fillFields'));return;}
   const startMins=timeToMins(time);
   const isNight=startMins>=19*60||startMins<6*60;
-  state.liveSession={date,startTime:time,startTs:Date.now(),isNight,briefWakes:[]};
+  // Calculate startTs from entered time so timer is accurate
+  const now=new Date();
+  const enteredMs=new Date(date+'T'+time).getTime();
+  state.liveSession={date,startTime:time,startTs:enteredMs,isNight,briefWakes:[]};
   saveState();startTimer();renderTracker();
 }
 function startTimer(){
@@ -952,7 +956,10 @@ function renderHistory(){
     const mood=state.mood&&state.mood[date]?MOOD_EMOJI[state.mood[date]]:'';
     const napPills=naps.flatMap((e,ei)=>(e.naps||[]).map((n,ni)=>`<span class="nap-pill">${n.start}–${n.end}<span class="del-nap" onclick="deleteNap('${date}',${ei},${ni})" title="${t('deleteNap')}">✕</span></span>`)).join('');
     return`<div class="history-item">
-      <div class="history-date">${label} <span class="tag ${tt}">${tl}</span>${relaxed?' <span class="tag tag-good">🛌</span>':''}${sick?' <span class="tag tag-bad">🤒</span>':''}${mood?` <span style="font-size:.9rem">${mood}</span>`:''}</div>
+      <div class="history-date" style="display:flex;justify-content:space-between;align-items:center">
+        <span>${label} <span class="tag ${tt}">${tl}</span>${relaxed?' <span class="tag tag-good">🛌</span>':''}${sick?' <span class="tag tag-bad">🤒</span>':''}${mood?` <span style="font-size:.9rem">${mood}</span>`:''}</span>
+        ${nightMins>0?`<button onclick="editNight('${date}')" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.2rem .5rem;font-size:.75rem;cursor:pointer">✏️</button>`:''}
+      </div>
       <div class="history-grid">
         <div class="history-stat">🌙 ${t('night')}: <span>${nightMins>0?fmtDur(nightMins):'—'}</span></div>
         <div class="history-stat">☀️ ${t('naps')}: <span>${napMins>0?fmtDur(napMins):'—'}</span></div>
