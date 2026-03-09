@@ -1027,7 +1027,8 @@ function renderHistory(){
     const mood=state.mood&&state.mood[date]?MOOD_EMOJI[state.mood[date]]:'';
     const napPills=naps.flatMap((e,ei)=>(e.naps||[]).map((n,ni)=>`<span class="nap-pill">${n.start}–${n.end}<span class="del-nap" onclick="deleteNap('${date}',${ei},${ni})" title="${t('deleteNap')}">✕</span></span>`)).join('');
     const nightEntry=nights[0];
-    const nightTimes=nightEntry?`<div style="font-size:.78rem;color:var(--muted);margin-top:.4rem">🌙 ${nightEntry.bedtime} → ☀️ ${nightEntry.waketime}</div>`:'';
+    const nightTimes=nightEntry?`<div style="font-size:.78rem;color:var(--muted);margin-top:.4rem">🌙 <span style="color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">${t('night')}</span> ${nightEntry.bedtime} → ☀️ ${nightEntry.waketime}</div>`:'';
+    const napPillsHtml=napPills?`<div class="history-naps"><span style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-right:.3rem">${t('naps')}</span>${napPills}</div>`:'';
     return`<div class="history-item">
       <div class="history-date" style="display:flex;justify-content:space-between;align-items:center">
         <span>${label} <span class="tag ${tt}">${tl}</span>${relaxed?' <span class="tag tag-good">🛌</span>':''}${sick?' <span class="tag tag-bad">🤒</span>':''}${mood?` <span style="font-size:.9rem">${mood}</span>`:''}</span>
@@ -1041,7 +1042,7 @@ function renderHistory(){
         ${sw>0?`<div class="history-stat">💤 ${lang==='da'?'Korte':'Brief'}: <span style="color:var(--muted)">${sw}x</span></div>`:''}
       </div>
       ${nightTimes}
-      ${napPills?`<div class="history-naps">${napPills}</div>`:''}
+      ${napPillsHtml}
     </div>`;
   }).join('');
 }
