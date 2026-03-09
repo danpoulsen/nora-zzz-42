@@ -694,10 +694,13 @@ function computeSuggestions(){
   let correctionMins=0;
   let latenessMins=0;
   if(lastNight){
-    let suggestedBed=lastNapEndMins!==null?lastNapEndMins+300:wakeGoalMins-rec.nightMin*60;
+    // Reconstruct what yesterday's suggested bedtime was using YESTERDAY's naps
+    const prevNapEntries=state.entries.filter(e=>e.date===lastNight.date&&e.type==='nap');
+    let prevLastNapEnd=null;
+    prevNapEntries.forEach(e=>{(e.naps||[]).forEach(n=>{let en=timeToMins(n.end);if(prevLastNapEnd===null||en>prevLastNapEnd)prevLastNapEnd=en;});});
+    let suggestedBed=prevLastNapEnd!==null?prevLastNapEnd+300:wakeGoalMins-rec.nightMin*60;
     if(suggestedBed<0)suggestedBed+=1440;
     let actualBed=timeToMins(lastNight.bedtime);
-    // Both should be in evening range (roughly 18:00–24:00+); normalise so comparison is valid
     if(actualBed<12*60)actualBed+=1440;
     if(suggestedBed<12*60)suggestedBed+=1440;
     latenessMins=actualBed-suggestedBed;
