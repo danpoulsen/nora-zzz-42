@@ -181,6 +181,14 @@ input:focus{border-color:var(--accent);}
     <div class="timer-display" id="timerDisplay">00:00:00</div>
     <div style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:.5rem" id="sleepingSince"></div>
     <button class="btn btn-brief" id="btnBriefWake" onclick="logBriefWake()">💤 <span id="briefWakeLabel">Vågnede kort</span></button>
+    <button class="btn btn-brief" id="btnLongWake" onclick="toggleLongWakeInput()" style="margin-top:.35rem;border-color:#b59eff;color:var(--accent2)">⏱ <span id="longWakeLabel">Lang opvågning</span></button>
+    <div id="longWakeInputBox" style="display:none;margin-top:.5rem;display:none">
+      <div style="display:flex;gap:.5rem;align-items:center;margin-top:.5rem">
+        <input type="time" id="longWakeTime" style="flex:1;min-width:0">
+        <input type="number" min="10" max="240" placeholder="min" id="longWakeDur" style="max-width:70px">
+        <button onclick="logLongWake()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.5rem .8rem;cursor:pointer;font-weight:600;font-size:.85rem">+</button>
+      </div>
+    </div>
     <button class="btn btn-primary" style="margin-top:.5rem" id="btnWakeUp" onclick="showEndSleep()">☀️ <span id="wakeUpLabel">Vågen</span></button>
   </div>
   <div id="startSleepBox">
@@ -370,13 +378,14 @@ const T={
     wakeUpLabel:"Vågen",briefWakeLabel:"Vågnede kort",
     briefWakesTitle:"💤 Korte opvågninger i nat",
     briefWakeLogged:"Kort opvågning logget",
+    longWakeLabel:"Lang opvågning",
     sickLabel:"Nora er syg i dag",sickToggleBtn:"Fjern",sickBtnLabel:"Nora er syg",
     checkinLabel:"Hvordan er Nora?",
     checkinTired:"😴 Træt",checkinOkay:"😐 Okay",checkinFresh:"😄 Frisk",
     moodTitle:"😊 Noras humør i dag",
     weekAvgNight:"Gns. nat",weekAvgNap:"Gns. lur",weekAvgTotal:"Gns. total",
     sickDay:"🤒 Syg",
-    reasonWakeWindow:(end,bed)=>`Noras sidste lur sluttede ${end} – med 4½ times vågevinde foreslås sengetid ${bed}.`,
+    reasonWakeWindow:(end,bed)=>`Noras sidste lur sluttede ${end} – med 5 times vågevinde foreslås sengetid ${bed}.`,
     reasonSoftFloor:"Sengetid er justeret til tidligst 19:30 – hold øje med træthedstegn.",
     reasonBase:(bed,wake)=>`Sengetid ${bed} giver Nora tid til at sove til opvågningsmålet ${wake}.`,
     reasonWeekend:"Weekend: ingen fast opvågning – Nora må sove til hun vågner naturligt.",
@@ -387,6 +396,7 @@ const T={
     reasonTired:"Nora virker træt – sengetid justeret 20 min. tidligere.",
     reasonFresh:"Nora virker frisk – sengetid justeret 20 min. senere.",
     reasonMissed:(mins)=>`Nora gik ${mins} min. for sent i seng i går – vi justerer gradvist.`,
+    reasonNoWakeWindow:"Ingen lure logget endnu i dag – sengetid er et foreløbigt estimat.",
   },
   en:{
     hdrTitle:"Nora's Sleep",ageUnit:"months",
@@ -425,12 +435,15 @@ const T={
     wakeUpLabel:"Awake",briefWakeLabel:"Brief waking",
     briefWakesTitle:"💤 Brief wakings tonight",
     briefWakeLogged:"Brief waking logged",
+    longWakeLabel:"Long waking",
     sickLabel:"Nora is sick today",sickToggleBtn:"Remove",sickBtnLabel:"Nora is sick",
     checkinLabel:"How is Nora?",
     checkinTired:"😴 Tired",checkinOkay:"😐 Okay",checkinFresh:"😄 Fresh",
     moodTitle:"😊 Nora's mood today",
     weekAvgNight:"Avg night",weekAvgNap:"Avg nap",weekAvgTotal:"Avg total",
     sickDay:"🤒 Sick",
+    reasonWakeWindow:(end,bed)=>`Nora's last nap ended at ${end} – with a 5-hour wake window, bedtime is suggested at ${bed}.`,
+    reasonNoWakeWindow:"No naps logged yet today – bedtime is a preliminary estimate.",
     reasonNoNaps:"No naps logged yet today – bedtime is a preliminary estimate.",
     reasonSoftFloor:"Bedtime adjusted to earliest 19:30 – watch for tired signs.",
     reasonBase:(bed,wake)=>`Bedtime at ${bed} gives Nora enough time to sleep through to the ${wake} wake-up goal.`,
@@ -467,6 +480,7 @@ function applyTranslations(){
   document.getElementById('timerLabel').textContent=t('timerLabel');
   document.getElementById('wakeUpLabel').textContent=t('wakeUpLabel');
   document.getElementById('briefWakeLabel').textContent=t('briefWakeLabel');
+  const lwl=document.getElementById('longWakeLabel');if(lwl)lwl.textContent=t('longWakeLabel');
   document.getElementById('confirmWakeLabel').textContent=t('confirmWakeLabel');
   document.getElementById('btnCancelWake').textContent=t('btnCancelWake');
   document.getElementById('sickToggleBtn').textContent=t('sickToggleBtn');
@@ -668,7 +682,7 @@ function computeSuggestions(){
   todayNapEntries.forEach(e=>{(e.naps||[]).forEach(n=>{let en=timeToMins(n.end);if(lastNapEndMins===null||en>lastNapEndMins)lastNapEndMins=en;});});
 
   let idealBedMins;
-  if(lastNapEndMins!==null){idealBedMins=lastNapEndMins+270;}
+  if(lastNapEndMins!==null){idealBedMins=lastNapEndMins+300;}
   else{idealBedMins=wakeGoalMins-(rec.nightMin*60);}
 
   let nudge=0;
@@ -678,10 +692,11 @@ function computeSuggestions(){
   idealBedMins+=nudge;
 
   let correctionMins=0;
+  let latenessMins=0;
   if(lastNight){
-    const baseBed=wakeGoalMins-rec.nightMin*60;
-    const lateness=timeToMins(lastNight.bedtime)-baseBed;
-    if(lateness>15)correctionMins=Math.min(15,Math.round(lateness*0.3));
+    const suggestedBed=lastNapEndMins!==null?lastNapEndMins+300:wakeGoalMins-rec.nightMin*60;
+    latenessMins=timeToMins(lastNight.bedtime)-suggestedBed;
+    if(latenessMins>15)correctionMins=Math.min(15,Math.round(latenessMins*0.3));
   }
   idealBedMins-=correctionMins;
 
@@ -689,22 +704,21 @@ function computeSuggestions(){
   if(checkin==='tired')idealBedMins-=20;
   else if(checkin==='fresh')idealBedMins+=20;
 
-  const softFloor=19*60+30,hardCeiling=22*60;
+  const softFloor=19*60+30;
   const hitSoftFloor=idealBedMins<softFloor;
   if(idealBedMins<softFloor)idealBedMins=softFloor;
-  if(idealBedMins>hardCeiling)idealBedMins=hardCeiling;
 
   const winddownMins=idealBedMins-s.winddownMins;
   const reasons=[];
   if(lastNapEndMins!==null){reasons.push(t('reasonWakeWindow',minsToTime(lastNapEndMins),minsToTime(idealBedMins)));}
-  else{reasons.push(t('reasonBase',minsToTime(idealBedMins),s.wakeGoal));reasons.push(t('reasonNoNaps'));}
+  else{reasons.push(t('reasonBase',minsToTime(idealBedMins),s.wakeGoal));reasons.push(t('reasonNoWakeWindow'));}
   if(todayRelaxed)reasons.push(t('reasonWeekend'));
   if(hadBadNight&&onlyOneNap)reasons.push(t('reasonBothBad'));
   else if(hadBadNight)reasons.push(t('reasonBadNight'));
   else if(hadShortNap)reasons.push(t('reasonShortNap'));
   if(onlyOneNap&&!hadBadNight)reasons.push(t('reasonOneNap'));
   if(hitSoftFloor)reasons.push(t('reasonSoftFloor'));
-  if(correctionMins>0)reasons.push(t('reasonMissed',Math.round(correctionMins/0.3)));
+  if(correctionMins>0)reasons.push(t('reasonMissed',Math.round(latenessMins)));
   if(checkin==='tired')reasons.push(t('reasonTired'));
   else if(checkin==='fresh')reasons.push(t('reasonFresh'));
 
@@ -838,11 +852,35 @@ function logBriefWake(){
   state.liveSession.briefWakes.push(nowTimeStr());
   saveState();renderBriefWakes();showToast(t('briefWakeLogged'));
 }
+function toggleLongWakeInput(){
+  const box=document.getElementById('longWakeInputBox');
+  const visible=box.style.display==='block';
+  box.style.display=visible?'none':'block';
+  if(!visible){
+    document.getElementById('longWakeTime').value=nowTimeStr();
+    document.getElementById('longWakeDur').value='';
+  }
+}
+function logLongWake(){
+  if(!state.liveSession)return;
+  const time=document.getElementById('longWakeTime').value;
+  const dur=parseInt(document.getElementById('longWakeDur').value)||0;
+  if(!time||dur<=0){showToast(t('fillFields'));return;}
+  if(!state.liveSession.longWakes)state.liveSession.longWakes=[];
+  state.liveSession.longWakes.push({time,duration:dur});
+  document.getElementById('longWakeInputBox').style.display='none';
+  saveState();renderBriefWakes();showToast(lang==='da'?'Lang opvågning logget':'Long waking logged');
+}
 function renderBriefWakes(){
   const el=document.getElementById('briefWakesList');
   if(!el||!state.liveSession)return;
   const bw=state.liveSession.briefWakes||[];
-  el.innerHTML=bw.length?bw.map(w=>`<div style="font-size:.82rem;color:var(--muted);padding:.2rem 0">💤 ${w}</div>`).join(''):`<div style="font-size:.82rem;color:var(--muted)">${lang==='da'?'Ingen endnu':'None yet'}</div>`;
+  const lw=state.liveSession.longWakes||[];
+  let html='';
+  if(bw.length)html+=bw.map(w=>`<div style="font-size:.82rem;color:var(--muted);padding:.2rem 0">💤 ${w}</div>`).join('');
+  if(lw.length)html+=lw.map(w=>`<div style="font-size:.82rem;color:var(--warn);padding:.2rem 0">⏱ ${w.time} – ${w.duration} min</div>`).join('');
+  if(!html)html=`<div style="font-size:.82rem;color:var(--muted)">${lang==='da'?'Ingen endnu':'None yet'}</div>`;
+  el.innerHTML=html;
 }
 function showEndSleep(){
   document.getElementById('endSleepBox').style.display='block';
@@ -858,9 +896,10 @@ function confirmEndSleep(){
   if(!live)return;
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
   const bwCount=live.briefWakes?live.briefWakes.length:0;
+  const longWakes=live.longWakes||[];
   if(live.isNight){
     state.entries=state.entries.filter(e=>!(e.date===live.date&&e.type==='night'));
-    state.entries.push({type:'night',date:live.date,bedtime:live.startTime,waketime:endTime,wakings:[],shortWakings:bwCount});
+    state.entries.push({type:'night',date:live.date,bedtime:live.startTime,waketime:endTime,wakings:longWakes,shortWakings:bwCount});
   } else {
     let existing=state.entries.find(e=>e.date===live.date&&e.type==='nap');
     if(existing)existing.naps=[...(existing.naps||[]),{start:live.startTime,end:endTime}];
@@ -955,6 +994,8 @@ function renderHistory(){
     const sick=isSick(date);
     const mood=state.mood&&state.mood[date]?MOOD_EMOJI[state.mood[date]]:'';
     const napPills=naps.flatMap((e,ei)=>(e.naps||[]).map((n,ni)=>`<span class="nap-pill">${n.start}–${n.end}<span class="del-nap" onclick="deleteNap('${date}',${ei},${ni})" title="${t('deleteNap')}">✕</span></span>`)).join('');
+    const nightEntry=nights[0];
+    const nightTimes=nightEntry?`<div style="font-size:.78rem;color:var(--muted);margin-top:.4rem">🌙 ${nightEntry.bedtime} → ☀️ ${nightEntry.waketime}</div>`:'';
     return`<div class="history-item">
       <div class="history-date" style="display:flex;justify-content:space-between;align-items:center">
         <span>${label} <span class="tag ${tt}">${tl}</span>${relaxed?' <span class="tag tag-good">🛌</span>':''}${sick?' <span class="tag tag-bad">🤒</span>':''}${mood?` <span style="font-size:.9rem">${mood}</span>`:''}</span>
@@ -967,12 +1008,33 @@ function renderHistory(){
         ${lw>0?`<div class="history-stat">😴 ${t('awake')}: <span style="color:var(--warn)">${fmtDur(lw)}</span></div>`:''}
         ${sw>0?`<div class="history-stat">💤 ${lang==='da'?'Korte':'Brief'}: <span style="color:var(--muted)">${sw}x</span></div>`:''}
       </div>
+      ${nightTimes}
       ${napPills?`<div class="history-naps">${napPills}</div>`:''}
     </div>`;
   }).join('');
 }
 
+function editNight(date){
+  const entry=state.entries.find(e=>e.date===date&&e.type==='night');
+  if(!entry)return;
+  showPage('log');
+  document.getElementById('nightDate').value=date;
+  document.getElementById('bedtime').value=entry.bedtime||'';
+  document.getElementById('waketime').value=entry.waketime||'';
+  document.getElementById('shortWakings').value=entry.shortWakings||0;
+  document.getElementById('wakingsList').innerHTML='';
+  wakingCount=0;
+  (entry.wakings||[]).forEach(w=>{
+    wakingCount++;const id='waking_'+wakingCount;
+    const div=document.createElement('div');div.className='waking-row';div.id=id;
+    div.innerHTML=`<input type="time" class="w-time" value="${w.time||''}"><input type="number" min="10" max="240" placeholder="min" class="w-dur" style="max-width:70px" value="${w.duration||''}"><button class="remove-btn" onclick="document.getElementById('${id}').remove()">✕</button>`;
+    document.getElementById('wakingsList').appendChild(div);
+  });
+}
+
 function deleteNap(date,ei,ni){
+  const confirmMsg=lang==='da'?'Slet denne lur?':'Delete this nap?';
+  if(!confirm(confirmMsg))return;
   const dayNaps=state.entries.filter(e=>e.date===date&&e.type==='nap');
   if(!dayNaps[ei])return;
   dayNaps[ei].naps.splice(ni,1);
