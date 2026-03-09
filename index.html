@@ -256,7 +256,12 @@ input:focus{border-color:var(--accent);}
 
 <!-- WEEK -->
 <div id="page-week" class="page">
-  <h2 id="weekTitle" style="margin-bottom:1rem">📊 Ugeoversigt</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+    <button onclick="changeWeek(-1)" style="background:var(--card2);border:1px solid var(--border);color:var(--accent2);border-radius:8px;padding:.4rem .8rem;font-size:1rem;cursor:pointer">‹</button>
+    <h2 id="weekTitle" style="margin:0">📊 Ugeoversigt</h2>
+    <button onclick="changeWeek(1)" id="btnWeekNext" style="background:var(--card2);border:1px solid var(--border);color:var(--accent2);border-radius:8px;padding:.4rem .8rem;font-size:1rem;cursor:pointer">›</button>
+  </div>
+  <div id="weekRangeLabel" style="text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:.75rem"></div>
   <div id="weekContent"></div>
 </div>
 
@@ -918,14 +923,33 @@ function confirmEndSleep(){
 }
 
 // ── Render Week ────────────────────────────────────────────────
+let weekOffset=0;
+function changeWeek(dir){
+  weekOffset+=dir;
+  if(weekOffset>0)weekOffset=0; // can't go into the future
+  const btn=document.getElementById('btnWeekNext');
+  if(btn)btn.style.opacity=weekOffset===0?'0.3':'1';
+  renderWeek();
+}
 function renderWeek(){
   const el=document.getElementById('weekContent');
   const today=new Date();
   const dow=today.getDay();
   const monday=new Date(today);
-  monday.setDate(today.getDate()-(dow===0?6:dow-1));
+  monday.setDate(today.getDate()-(dow===0?6:dow-1)+(weekOffset*7));
   const dates=[];
   for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);dates.push(d.toISOString().slice(0,10));}
+
+  // Update range label
+  const rangeEl=document.getElementById('weekRangeLabel');
+  if(rangeEl){
+    const fmt=d=>new Date(d+'T12:00:00').toLocaleDateString(lang==='da'?'da-DK':'en-GB',{day:'2-digit',month:'short'});
+    const label=weekOffset===0?(lang==='da'?'Denne uge':'This week'):(weekOffset===-1?(lang==='da'?'Sidste uge':'Last week'):`${fmt(dates[0])} – ${fmt(dates[6])}`);
+    rangeEl.textContent=label;
+  }
+  // Dim next button when on current week
+  const btn=document.getElementById('btnWeekNext');
+  if(btn)btn.style.opacity=weekOffset===0?'0.3':'1';
 
   const rec=recSleep(calcAgeMonths());
   const maxMins=rec.max*60;
